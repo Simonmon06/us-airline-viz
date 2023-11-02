@@ -22,7 +22,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
       // attribute 1 defines radius scale
       const radiusScale = d3.scaleLinear()
       .domain([0, d3.max(data, d => d[attr1Name])])
-      .range([5, innerWidth / 12]);
+      .range([5, innerWidth / 14]);
       
       // attribute 2 defines color scale
       const colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
