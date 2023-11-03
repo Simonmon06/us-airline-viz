@@ -3,3 +3,18 @@
   height: 100vh;
   width: 100%;
 }
+
+.App .container {
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 100%;
+}
+
+.App .container .sub-container {
+  margin-top: 20px;
+  border: beige;
+  border-style: groove;
+  padding: 5px;
+}
