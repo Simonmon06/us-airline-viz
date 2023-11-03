@@ -35,7 +35,7 @@ const buildAggregateRouteData = (routes, startMonth, endMonth, topK=10) => {
   return answer
 }
 
-export const Page2 = () => {
+export const Summary = () => {
 
   // ***** Page2 States *******
 
@@ -80,23 +80,29 @@ export const Page2 = () => {
     console.log('nothing yet.')
   }
   // Add more conditions for other SVG types as needed
-
   return (
-    <div>
-      <div>
-        <h1>More Charts</h1>
-        <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}></DateRangePicker>
+    <div class="container">
+      <div class="container-header">
+        <h1>Stats</h1>
+        <div>
+          This page shows different visualization on summary statistics.
+        </div>
+      </div>
+      <div class="sub-container">
 
         {/* Add other filters here */}
-        <div style={{marginLeft: '40px'}}>
+        <div>
           <button onClick={() => changeSVG('bubbleChart')}>Show Bubble Chart</button>
           <button onClick={() => changeSVG('otherSVGType')}>Show Other SVG</button>
+        {/* Add buttons for other SVG types */}
         </div>
 
-        {/* Add buttons for other SVG types */}
-      </div>
-      <div>
-        {svgComponent}
+        <div class="svg-container">
+          <div>
+            <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}></DateRangePicker>
+          </div>
+          {svgComponent}
+        </div>
       </div>
     </div>
   );
