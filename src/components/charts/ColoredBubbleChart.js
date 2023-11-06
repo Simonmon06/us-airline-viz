@@ -13,16 +13,15 @@ import * as d3 from 'd3';
 const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
   const svgRef = useRef();
   useEffect(() => {
-
     if (data && svgRef.current) {
 
       const svg = d3.select(svgRef.current);
 
       const width = 800;
       const height = 600;
-      const legendWidth = 25;
+      const legendWidth = 20;
 
-      const margin = { top: 20, right: 20, bottom: 20, left: 5 };
+      const margin = { top: 20, right: 20, bottom: 20, left: 40 };
       const innerWidth = width - margin.left - margin.right - legendWidth;
       const innerHeight = height - margin.top - margin.bottom;
 
@@ -82,7 +81,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
 
 
       const g = svg.append('g')
-        .attr('transform', `translate(${margin.left + legendWidth}, ${margin.top})`);
+        .attr('transform', `translate(${margin.left + legendWidth},${margin.top})`);
 
       g.append('rect')
         .attr('width', innerWidth - legendWidth)
