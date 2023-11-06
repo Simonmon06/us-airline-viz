@@ -3,6 +3,14 @@ import * as d3 from 'd3';
 
 // https://d3-graph-gallery.com/graph/streamgraph_template.html
 
+
+// Data Format:
+// year,Amanda,Ashley,Betty,Deborah,Dorothy,Helen,Linda,Patricia
+// 1880,241,0,117,12,112,636,27,0
+// 1881,263,0,112,14,109,612,38,0
+// 1882,288,0,123,15,115,838,36,0
+// 1883,287,0,120,16,141,862,49,0
+
 const StreamChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
 
   const svgRef = useRef();
@@ -106,8 +114,6 @@ const StreamChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
         .on("mouseover", mouseover)
         .on("mousemove", mousemove)
         .on("mouseleave", mouseleave)
-
-    })
 
     }
   }, [data]);

@@ -1,39 +1,23 @@
 import React, { useState, useEffect } from 'react';
+import { Route } from 'react-router-dom';
 
-// month picker
+// *********  Utilities  *********
 import DateRangePicker from '../commons/DateRangePicker/DateRangePicker';
+import { chartDataAggregator} from '../commons/utils';
 
-// route bubble chart
-import BubbleChart from "../charts/RouteBubbleChart";
+// *********  Charts  *********
+import BubbleChart from "../charts/ColoredBubbleChart";
 
-// JSON route data
+// *********  Data  *********
 import RouteDataString from '../../data/route_data.json';
-const RouteData= JSON.parse(RouteDataString);
+import AirlineDataString from '../../data/airline_data.json';
 
-// filter route data by month selection; return topK by total traffic in range. 
-const buildAggregateRouteData = (routes, startMonth, endMonth, topK=10) => {
-  // routes: JSOn route data
-  // startMonth, endMonth: integer/string month values (1-12)
-  let filteredRoutes = routes.filter(route => Number(route.Month) >= startMonth && Number(route.Month) <= endMonth);
-  let aggregatedRoutes = filteredRoutes.reduce((acc, route) => {
-    if (!acc[route.Route]) { acc[route.Route] = [route.TotalTraffic, route.AvgDepDelay * route.TotalTraffic]; }
-    acc[route.Route][0] += route.TotalTraffic;
-    acc[route.Route][1] += route.AvgDepDelay * route.TotalTraffic;
-    return acc
-  }, {});
-  let sortedAggregatedRoutes = Object.entries(aggregatedRoutes)
-    .sort((a, b) => b[1][0] - a[1][0]).slice(0, topK); // Sort in descending order; for ascending, use a[1] - b[1]
-  let answer = [];
-  for (let i=0; i<sortedAggregatedRoutes.length; i++) {
-    let route = sortedAggregatedRoutes[i];
-    answer.push({
-      route: route[0],
-      traffic: route[1][0],
-      delay: route[1][1] / route[1][0]
-    })
-  }
-  return answer
-}
+// *******  Page2  ********
+const AirlineData = JSON.parse(AirlineDataString); // [{}]
+const RouteData= JSON.parse(RouteDataString); // [{}]
+
+
+console.log(chartDataAggregator.getAirlineData(AirlineData, 1, 6));
 
 export const Summary = () => {
 
@@ -47,7 +31,7 @@ export const Summary = () => {
   const [endMonth, setEndMonth] = useState(5); // init: June
 
   // init chart data
-  const [bubbleData, setBubbleData] = useState(buildAggregateRouteData(RouteData, startMonth, endMonth)); 
+  const [bubbleData, setBubbleData] = useState(chartDataAggregator.getRouteData(RouteData, startMonth, endMonth)); 
 
   // pipe datepicker value change to Page2
   const handleMonthChange = (values) => {
@@ -58,7 +42,7 @@ export const Summary = () => {
   // update bubbleData when date range changes
   useEffect(() => { 
     if (selectedSVG === 'bubbleChart') {
-      setBubbleData(buildAggregateRouteData(RouteData, startMonth + 1, endMonth + 1));
+      setBubbleData(chartDataAggregator.getRouteData(RouteData, startMonth + 1, endMonth + 1));
     }
   }, [selectedSVG, startMonth, endMonth]);
 

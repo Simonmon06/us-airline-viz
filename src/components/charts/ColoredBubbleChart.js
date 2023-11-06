@@ -1,9 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 
+// Colored Bubble Chart
+//   Produce a svg with bubbles randomly placed on the screen with radius and color defined by data
+
+// Data format:
+//  data = [item] 
+//  item = {attr1Name: Number, size of bubble, attri2Name: Number, color scale, attr3Name: String, label text}
+//  Might need to adjust radiusScale.range to fit all bubbles in box boundaries
+//  10 or less bubbles will produce the best visual effect
+
 const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
   const svgRef = useRef();
-
   useEffect(() => {
 
     if (data && svgRef.current) {
