@@ -14,7 +14,6 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
   const svgRef = useRef();
   useEffect(() => {
     if (data && svgRef.current) {
-
       const svg = d3.select(svgRef.current);
 
       const width = 800;
@@ -106,7 +105,6 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
         .attr("alignment-baseline", "middle")
         .attr('fill', 'white')
         .text(d => d[attr3Name]);
-
 
     g.append('text')
         .attr('x', -legendWidth)

@@ -38,9 +38,9 @@ export const Home = () => {
     setTopRoutesData(routesWithCoords)
   }, []);
   
-  console.log(topRoutesData)
+  // console.log(topRoutesData)
   // console.log('topRoutes',topRoutes)
-  console.log('usMapData', usMapData)
+  // console.log('usMapData', usMapData)
   return <UsMap topRoutesData={topRoutesData} usMapData={usMapData}/>;
 
 };

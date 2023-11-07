@@ -7,6 +7,7 @@ import { chartDataAggregator} from '../commons/utils';
 
 // *********  Charts  *********
 import BubbleChart from "../charts/ColoredBubbleChart";
+import StreamChart from '../charts/StreamChart';
 
 // *********  Data  *********
 import RouteDataString from '../../data/route_data.json';
@@ -14,11 +15,10 @@ import AirlineDataString from '../../data/airline_data.json';
 
 // *******  Page2  ********
 const AirlineData = JSON.parse(AirlineDataString); // [{}]
-const RouteData= JSON.parse(RouteDataString); // [{}]
+const RouteData = JSON.parse(RouteDataString); // [{}]
 
-
-console.log(chartDataAggregator.getAirlineData(AirlineData, 1, 6));
-
+// console.log(chartDataAggregator.getAirlineData(AirlineData, 1, 6));
+// console.log(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, 1, 12, "TotalTraffic"));
 export const Summary = () => {
 
   // ***** Page2 States *******
@@ -32,6 +32,7 @@ export const Summary = () => {
 
   // init chart data
   const [bubbleData, setBubbleData] = useState(chartDataAggregator.getRouteData(RouteData, startMonth, endMonth)); 
+  const [streamData, setStreamData] = useState(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, startMonth, endMonth, "TotalTraffic"));
 
   // pipe datepicker value change to Page2
   const handleMonthChange = (values) => {
@@ -43,6 +44,11 @@ export const Summary = () => {
   useEffect(() => { 
     if (selectedSVG === 'bubbleChart') {
       setBubbleData(chartDataAggregator.getRouteData(RouteData, startMonth + 1, endMonth + 1));
+    } else if (selectedSVG === 'streamChart') {
+      setStreamData(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, startMonth + 1, 
+                      endMonth + 1, "TotalTraffic"));
+    } else {
+      console.log('nothing');
     }
   }, [selectedSVG, startMonth, endMonth]);
 
@@ -55,13 +61,11 @@ export const Summary = () => {
   // Render different SVG components based on the selectedSVG state
   let svgComponent;
   if (selectedSVG === 'bubbleChart') {
-    // Render BubbleChart component
     svgComponent = <BubbleChart data={bubbleData} attr1Name={"traffic"} attr2Name={'delay'} attr3Name={'route'}/>;
+  } else if (selectedSVG === 'streamChart') {
+    svgComponent = <StreamChart data={streamData} attr1Name={"Month"} attr2Name={'delay'} attr3Name={''}/>;
   } else if (selectedSVG === 'otherSVGType') {
-    // Render other type of SVG component
-    // You can create another SVG component similar to BubbleChart
-    // svgComponent = <OtherSVGComponent />;
-    console.log('nothing yet.')
+    console.log('otherSVGType');
   }
   // Add more conditions for other SVG types as needed
   return (
@@ -77,6 +81,7 @@ export const Summary = () => {
         {/* Add other filters here */}
         <div>
           <button onClick={() => changeSVG('bubbleChart')}>Show Bubble Chart</button>
+          <button onClick={() => changeSVG('streamChart')}>Show Stream Chart</button>
           <button onClick={() => changeSVG('otherSVGType')}>Show Other SVG</button>
         {/* Add buttons for other SVG types */}
         </div>
