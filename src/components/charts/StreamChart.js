@@ -65,9 +65,9 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName}) => {
         const y = d3.scaleLinear()
             .domain([-50000, 50000])
             .range([ height, 0 ]);
-        svg.append("g")
-            .attr("transform", `translate(${leftOffSet}, 0)`)
-            .call(d3.axisLeft(y));
+        // svg.append("g")
+        //     .attr("transform", `translate(${leftOffSet}, 0)`)
+        //     .call(d3.axisLeft(y));
 
         // color palette
         const color = d3.scaleOrdinal()
