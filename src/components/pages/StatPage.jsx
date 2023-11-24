@@ -4,7 +4,7 @@ import { Route } from 'react-router-dom';
 
 // *********  Utilities  *********
 import DateRangePicker from '../commons/DateRangePicker/DateRangePicker';
-import { chartDataAggregator} from '../commons/utils';
+import { chartDataAggregator, appConstants } from '../commons/utils';
 
 // *********  Charts  *********
 import BubbleChart from "../charts/ColoredBubbleChart";
@@ -18,8 +18,7 @@ import AirlineDataString from '../../data/airline_data.json';
 const AirlineData = JSON.parse(AirlineDataString); // [{}]
 const RouteData = JSON.parse(RouteDataString); // [{}]
 
-// console.log(chartDataAggregator.getAirlineData(AirlineData, 1, 6));
-// console.log(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, 1, 12, "TotalTraffic"));
+
 export const StatPage = () => {
 
   // ***** Page2 States *******
@@ -28,11 +27,11 @@ export const StatPage = () => {
   const [selectedSVG, setSelectedSVG] = useState('bubbleChart'); // Initial state for BubbleChart
 
   // init date range
-  const [startMonth, setStartMonth] = useState(2); // init: March
-  const [endMonth, setEndMonth] = useState(5); // init: June
+  const [startMonth, setStartMonth] = useState(appConstants.initStartMonth); // init: March
+  const [endMonth, setEndMonth] = useState(appConstants.initEndMonth); // init: June
 
   // init chart data
-  const [bubbleData, setBubbleData] = useState(chartDataAggregator.getRouteData(RouteData, startMonth, endMonth)); 
+  const [bubbleData, setBubbleData] = useState(chartDataAggregator.getRouteData(RouteData, startMonth, endMonth));
   const [streamData, setStreamData] = useState(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, startMonth, endMonth, "TotalTraffic"));
 
   // pipe datepicker value change to Page2
@@ -42,16 +41,15 @@ export const StatPage = () => {
   };
 
   // update bubbleData when date range changes
-  useEffect(() => { 
+  useEffect(() => {
 
-    console.log(selectedSVG, startMonth, endMonth);
-    console.log(streamData);
+    document.getElementById("stat-description-div").innerHTML = "";
 
     if (selectedSVG === 'bubbleChart') {
       setBubbleData(chartDataAggregator.getRouteData(RouteData, startMonth + 1, endMonth + 1));
     } else if (selectedSVG === 'streamChart') {
-      setStreamData(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, startMonth + 1, 
-                      endMonth + 1, "TotalTraffic"));
+      setStreamData(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, startMonth + 1,
+        endMonth + 1, "TotalTraffic"));
     } else {
       console.log('nothing');
     }
@@ -66,9 +64,9 @@ export const StatPage = () => {
   // Render different SVG components based on the selectedSVG state
   let svgComponent;
   if (selectedSVG === 'bubbleChart') {
-    svgComponent = <BubbleChart data={bubbleData} attr1Name={"traffic"} attr2Name={'delay'} attr3Name={'route'}/>;
+    svgComponent = <BubbleChart data={bubbleData} attr1Name={"traffic"} attr2Name={'delay'} attr3Name={'route'} />;
   } else if (selectedSVG === 'streamChart') {
-    svgComponent = <StreamChart data={streamData} attr1Name={"Month"} attr2Name={'delay'} attr3Name={''}/>;
+    svgComponent = <StreamChart data={streamData} attr1Name={"Month"} attr2Name={'delay'} attr3Name={''} />;
   } else if (selectedSVG === 'otherSVGType') {
     console.log('otherSVGType');
   }
@@ -100,10 +98,10 @@ export const StatPage = () => {
         {/* information container */}
         <div class="stat-sub-right">
           <div>
-            <h2 style={{margin: "none", marginTop: "5px"}}>Stat Information</h2>
+            <h2 style={{ margin: "none", marginTop: "5px" }}>Stat Information</h2>
           </div>
           <div id="stat-description-div"
-            style={{ border: "1px solid black", marginTop: "1px", marginRight: "1%", minHeight: "40%"}}></div>
+            style={{ border: "1px solid black", marginTop: "1px", marginRight: "1%", minHeight: "40%" }}></div>
         </div>
 
       </div>

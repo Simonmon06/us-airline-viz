@@ -1,7 +1,5 @@
-import { filter } from "d3";
-
 class chartDataAggregator {
-    static getRouteData = (routes, startMonth, endMonth, topK=10) => {
+    static getRouteData = (routes, startMonth, endMonth, topK = 10) => {
         let filteredRoutes = routes.filter(route => Number(route.Month) >= startMonth && Number(route.Month) <= endMonth);
         let aggregatedRoutes = filteredRoutes.reduce((acc, route) => {
             if (!acc[route.Route]) { acc[route.Route] = [route.TotalTraffic, route.AvgDepDelay * route.TotalTraffic]; }
@@ -12,12 +10,12 @@ class chartDataAggregator {
         let sortedAggregatedRoutes = Object.entries(aggregatedRoutes)
             .sort((a, b) => b[1][0] - a[1][0]).slice(0, topK); // Sort in descending order; for ascending, use a[1] - b[1]
         let answer = [];
-        for (let i=0; i<sortedAggregatedRoutes.length; i++) {
+        for (let i = 0; i < sortedAggregatedRoutes.length; i++) {
             let route = sortedAggregatedRoutes[i];
             answer.push({
-            route: route[0],
-            traffic: route[1][0],
-            delay: route[1][1] / route[1][0]
+                route: route[0],
+                traffic: route[1][0],
+                delay: route[1][1] / route[1][0]
             })
         }
         return answer
@@ -35,7 +33,7 @@ class chartDataAggregator {
 
         let answer = [];
         Object.keys(stackedData).forEach(month => {
-            answer.push({Month: Number(month), ...stackedData[month]});
+            answer.push({ Month: Number(month), ...stackedData[month] });
         });
 
         // console.log('utis', answer);
@@ -44,4 +42,9 @@ class chartDataAggregator {
 
 }
 
-export { chartDataAggregator}
+const appConstants = {
+    initStartMonth: 2,
+    initEndMonth: 5
+}
+
+export { chartDataAggregator, appConstants }

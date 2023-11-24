@@ -10,14 +10,16 @@ import * as d3 from 'd3';
 //  Might need to adjust radiusScale.range to fit all bubbles in box boundaries
 //  10 or less bubbles will produce the best visual effect
 
-const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
+const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
   const svgRef = useRef();
   useEffect(() => {
     if (data && svgRef.current) {
       const svg = d3.select(svgRef.current);
 
-      const width = 800;
-      const height = 600;
+      // const width = 800;
+      // const height = 600;
+      const width = 700;
+      const height = 500;
       const legendWidth = 20;
 
       const margin = { top: 35, right: 20, bottom: 20, left: 40 };
@@ -28,9 +30,9 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
 
       // attribute 1 defines radius scale
       const radiusScale = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d[attr1Name])])
-      .range([5, innerWidth / 14]);
-      
+        .domain([0, d3.max(data, d => d[attr1Name])])
+        .range([5, innerWidth / 15]);
+
       // attribute 2 defines color scale
       const colorScale = d3.scaleSequential(d3.interpolateYlOrRd)
         .domain([0, d3.max(data, d => d[attr2Name])]);
@@ -41,10 +43,10 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
         .attr('height', height);
 
       const simulationData = data.map(d => ({
-          ...d,
-          x: Math.random() * innerWidth,
-          y: Math.random() * innerHeight
-        }));
+        ...d,
+        x: Math.random() * innerWidth,
+        y: Math.random() * innerHeight
+      }));
 
       const simulation = d3.forceSimulation(simulationData)
         .force('x', d3.forceX(innerWidth / 2).strength(0.05))
@@ -53,7 +55,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
         .stop();
 
       for (let i = 0; i < 300; ++i) simulation.tick();
-      
+
       // add legend
       const legendGradient = svg.append("defs")
         .append("linearGradient")
@@ -96,47 +98,44 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
         .attr('cx', innerWidth / 2)
         .attr("cy", innerHeight / 2)
         ;
-      
+
       // add transition
       circles.transition()
         .duration(300)
         .attr("cx", d => d.x).attr("cy", d => d.y)
-        .attr("r", d => radiusScale (d[attr1Name]))
+        .attr("r", d => radiusScale(d[attr1Name]))
         .attr("fill", d => colorScale(d[attr2Name]));
 
       // stat tooltip
       const Tooltip = d3.select('#stat-description-div').html('');
 
-      var mouseover = function(d) {
+      var mouseover = function (e, d) {
         d3.select(this).style("stroke", "black").style("opacity", 1)
       }
 
-      var mousemove = function(d) {
-        // console.log(d.target.__data__)
-
-        var _data = d.target.__data__;
+      var mousemove = function (e, d) {
         var _html = `
-        <div>
-          <br>Route: </br>${_data.route}
-        </div>
-        <div>
-          <br>Total Traffic: </br> ${_data.traffic}
-        </div>
-        <div>
-          <br>Avg Delay: </br> ${_data.delay}
-        </div>
+          <div>
+            <br>Route: </br>${d.route}
+          </div>
+          <div>
+            <br>Total Traffic: </br> ${d.traffic}
+          </div>
+          <div>
+            <br>Avg Delay: </br> ${d.delay}
+          </div>
         `
 
         Tooltip
           .html(_html)
-          .style("left", (d3.pointer(this)[0]+70) + "px")
+          .style("left", (d3.pointer(this)[0] + 70) + "px")
           .style("top", (d3.pointer(this)[1]) + "px")
       }
 
-      var mouseleave = function(d) {
+      var mouseleave = function (e, d) {
         d3.select(this).style("stroke", "none").style("opacity", 0.8)
       }
-  
+
       // add tooltip function
       circles.on("mouseover", mouseover)
         .on("mousemove", mousemove)
@@ -155,10 +154,10 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
 
       // add colormap legend text
       g.append('text')
-          .attr('x', -legendWidth - 10)
-          .attr('y', -2)
-          .attr('fill', 'black')
-          .text(`${numberFormat(d3.max(data, d => d[attr2Name]))}`);
+        .attr('x', -legendWidth - 10)
+        .attr('y', -2)
+        .attr('fill', 'black')
+        .text(`${numberFormat(d3.max(data, d => d[attr2Name]))}`);
 
       g.append('text')
         .attr('x', -legendWidth - 10)
@@ -168,18 +167,18 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
 
       // add title
       g.append('text')
-          .attr('x', innerWidth / 2 - 100) 
-          .attr('y', -10)
-          .attr('fill', 'black')
-          .attr('font-weight', 'bold')
-          .text(`Top 10 Route Traffic`);
+        .attr('x', innerWidth / 2 - 100)
+        .attr('y', -10)
+        .attr('fill', 'black')
+        .attr('font-weight', 'bold')
+        .text(`Top 10 Route Traffic`);
 
       // add legend title
       g.append('text')
-          .attr('x', -legendWidth - 10)
-          .attr('y', -20)
-          .attr('fill', 'black')
-          .text(`Delay (Minutes)`);
+        .attr('x', -legendWidth - 10)
+        .attr('y', -20)
+        .attr('fill', 'black')
+        .text(`Delay (Minutes)`);
     }
   }, [data]);
 
