@@ -22,6 +22,7 @@
 /* stat page  */
 .stat-container {
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
 }
@@ -29,19 +30,32 @@
 .stat-sub-left {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   width: 70%;
+  flex: 1;
+  order: 1;
 }
 
 .stat-sub-right {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   width: 30%;
+  flex: 1;
+  order: 2;
 }
 
-@media (max-width: 768px) {
-  .stat-sub-left .stat-sub-right {
+#stat-description-div {
+  border: "1px solid black";
+  margin-top: 1px;
+  margin-right: 5%; 
+  min-height: 40%;
+  padding: 5px;
+
+  .div { margin-top: 5px;}
+}
+
+@media (max-width: 864px) {
+  .stat-sub-left, .stat-sub-right {
     flex: 100%; /* Make columns take up 100% width individually */
+    order: 0;
   }
 }

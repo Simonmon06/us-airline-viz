@@ -94,6 +94,11 @@ export const StatPage = () => {
 
         {/* information container */}
         <div class="stat-sub-right">
+          <div>
+            <h2 style={{margin: "none", marginTop: "5px"}}>Stat Information</h2>
+          </div>
+          <div id="stat-description-div"
+            style={{ border: "1px solid black", marginTop: "1px", marginRight: "1%", minHeight: "40%"}}></div>
         </div>
 
       </div>
