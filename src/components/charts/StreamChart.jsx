@@ -10,7 +10,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
 
     const svgRef = useRef();
 
-    const [switchBar, setSwitchBar] = useState(false);
+    const [isBarplot, setisBarplot] = useState(false);
 
     useEffect(() => {
         if (data && svgRef.current) {
@@ -21,7 +21,6 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
             const height = 400;
             const leftOffSet = 10;
 
-            //   const margin = { top: 20, right: 20, bottom: 20, left: 40 };
             const margin = { top: 35, right: 20, bottom: 20, left: 40 };
             const innerWidth = width - margin.left - margin.right;
             const innerHeight = height - margin.top - margin.bottom;
@@ -35,20 +34,20 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
 
             // switch button
             var buttonContainer = svg.append("foreignObject")
-                .attr("width", 100)
+                .attr("width", 150)
                 .attr("height", 30)
                 .attr("x", 10)
                 .attr("y", 10)
                 .append("xhtml:body")
-                .html("<button style='width:100%;height:100%;'>Change View</button>");
+                .html(`<button style='width:100%; height:100%;'>${isBarplot ? 'View Streamgraph' : 'View Barplot'}</button>`);
 
             // Add an event listener to the button
             buttonContainer.select("button")
                 .on("click", function () {
-                    setSwitchBar(!switchBar);
+                    setisBarplot(!isBarplot);
                 });
 
-            if (switchBar === false) {
+            if (isBarplot === false) {
 
                 // set the dimensions and margins of the graph
                 let [x_min, x_max] = d3.extent(data, function (d) { return d.Month; });
@@ -223,7 +222,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
 
             } // end if
         }
-    }, [data, switchBar]);
+    }, [data, isBarplot]);
     return (
         <svg ref={svgRef}></svg>
     );

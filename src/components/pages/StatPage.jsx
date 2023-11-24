@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router-dom';
 
 
+
 // *********  Utilities  *********
 import DateRangePicker from '../commons/DateRangePicker/DateRangePicker';
 import { chartDataAggregator, appConstants } from '../commons/utils';
@@ -13,10 +14,13 @@ import StreamChart from '../charts/StreamChart';
 // *********  Data  *********
 import RouteDataString from '../../data/route_data.json';
 import AirlineDataString from '../../data/airline_data.json';
+import { Button, ButtonGroup } from 'react-bootstrap';
 
 // *******  Page2  ********
 const AirlineData = JSON.parse(AirlineDataString); // [{}]
 const RouteData = JSON.parse(RouteDataString); // [{}]
+
+
 
 
 export const StatPage = () => {
@@ -39,6 +43,15 @@ export const StatPage = () => {
     setStartMonth(values[0]);
     setEndMonth(values[1]);
   };
+
+  function myClickFn(e) {
+    var chart_type = e.target.getAttribute('type');
+    if (chart_type === 'bubble') { 
+      changeSVG('bubbleChart')
+    } else {
+      changeSVG('streamChart')
+    }
+  }
 
   // update bubbleData when date range changes
   useEffect(() => {
@@ -68,19 +81,23 @@ export const StatPage = () => {
   } else if (selectedSVG === 'streamChart') {
     svgComponent = <StreamChart data={streamData} attr1Name={"Month"} attr2Name={'delay'} attr3Name={''} />;
   } else if (selectedSVG === 'otherSVGType') {
-    console.log('otherSVGType');
+    console.log('');
   }
   // Add more conditions for other SVG types as needed
   return (
     <div class="container">
       <div class="container-header">
-        <h1>Flgiht Summary Statistics</h1>
+        <h1>Flgiht Statistics</h1>
       </div>
       <div>
-        <button onClick={() => changeSVG('bubbleChart')}>Show Bubble Chart</button>
-        <button onClick={() => changeSVG('streamChart')}>Show Stream Chart</button>
-        <button onClick={() => changeSVG('otherSVGType')}>Show Other SVG</button>
-        {/* Add other filters here */}
+        <ButtonGroup size="lg" className="mb-2">
+          <Button variant="pug" type="bubble" onClick={myClickFn}>Route Traffic</Button>
+          <Button variant="pug" type="stream" onClick={myClickFn}>Airline Traffic</Button>
+          <Button variant="pug" type="placeholder" style={{pointEvents: "none", cursor: "default"}}>More</Button>
+        </ButtonGroup>
+      </div>
+      <div>
+
       </div>
       <div>
         <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}></DateRangePicker>
@@ -98,7 +115,7 @@ export const StatPage = () => {
         {/* information container */}
         <div class="stat-sub-right">
           <div>
-            <h2 style={{ margin: "none", marginTop: "5px" }}>Stat Information</h2>
+            <h2 style={{ margin: "none", marginTop: "5px" }}>Details</h2>
           </div>
           <div id="stat-description-div"
             style={{ border: "1px solid black", marginTop: "1px", marginRight: "1%", minHeight: "40%" }}></div>

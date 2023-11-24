@@ -4,15 +4,21 @@
   width: 100%;
 }
 
-.App .container {
-  margin-left: auto;
-  margin-right: auto;
+/* overall container */
+.container {
+  margin: auto;
   padding-left: 15px;
   padding-right: 15px;
   width: 100%;
 }
 
-.App .container .sub-container {
+.container-header h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* container body */
+.container .sub-container {
   margin-top: 20px;
   border: beige;
   border-style: groove;
@@ -58,4 +64,37 @@
     flex: 100%; /* Make columns take up 100% width individually */
     order: 0;
   }
+}
+
+.btn-pug {
+  appearance: button;
+    backface-visibility: hidden;
+    color: #fff;
+    background-color: #182647;
+    border-radius: 6px;
+    border-width: 0;
+    box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .1) 0 2px 5px 0, rgba(0, 0, 0, .07) 0 1px 1px 0;
+    box-sizing: border-box;
+    cursor: pointer;
+    font-size: 100%;
+    margin: 5px 5px 0 0;
+    height: 2rem;
+    max-width: 10rem;
+    line-height: 1.15;
+    outline: none;
+    overflow: hidden;
+    padding: 0 20px;
+    position: relative;
+    text-align: center;
+    text-transform: none;
+    transform: translateZ(0);
+    transition: all .2s,box-shadow .08s ease-in;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    opacity: 0.9;
+}
+
+.btn-pug:not([type="placeholder"]):hover{
+  opacity: 1;
 }
