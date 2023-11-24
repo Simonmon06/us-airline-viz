@@ -12,8 +12,8 @@ export default function DateRangePicker({initStart, initEnd, handleChange}) {
   const [maxValue, setMaxValue] = useState(initEnd);
 
   // on change: after values set
-  const [minValue2, setMinValue2] = useState(0);
-  const [maxValue2, setMaxValue2] = useState(0);
+  const [minValue2, setMinValue2] = useState(2);
+  const [maxValue2, setMaxValue2] = useState(5);
   const [minCaption, set_minCaption] = useState("");
   const [maxCaption, set_maxCaption] = useState("");
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router-dom';
 
+
 // *********  Utilities  *********
 import DateRangePicker from '../commons/DateRangePicker/DateRangePicker';
 import { chartDataAggregator} from '../commons/utils';
@@ -42,6 +43,10 @@ export const StatPage = () => {
 
   // update bubbleData when date range changes
   useEffect(() => { 
+
+    console.log(selectedSVG, startMonth, endMonth);
+    console.log(streamData);
+
     if (selectedSVG === 'bubbleChart') {
       setBubbleData(chartDataAggregator.getRouteData(RouteData, startMonth + 1, endMonth + 1));
     } else if (selectedSVG === 'streamChart') {
