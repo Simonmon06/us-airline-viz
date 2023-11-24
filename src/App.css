@@ -18,3 +18,30 @@
   border-style: groove;
   padding: 5px;
 }
+
+/* stat page  */
+.stat-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.stat-sub-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 70%;
+}
+
+.stat-sub-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30%;
+}
+
+@media (max-width: 768px) {
+  .stat-sub-left .stat-sub-right {
+    flex: 100%; /* Make columns take up 100% width individually */
+  }
+}

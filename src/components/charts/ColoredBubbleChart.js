@@ -20,7 +20,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
       const height = 600;
       const legendWidth = 20;
 
-      const margin = { top: 20, right: 20, bottom: 20, left: 40 };
+      const margin = { top: 35, right: 20, bottom: 20, left: 40 };
       const innerWidth = width - margin.left - margin.right - legendWidth;
       const innerHeight = height - margin.top - margin.bottom;
 
@@ -40,11 +40,11 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
       svg.attr('width', width)
         .attr('height', height);
 
-        const simulationData = data.map(d => ({
-            ...d,
-            x: Math.random() * innerWidth,
-            y: Math.random() * innerHeight
-          }));
+      const simulationData = data.map(d => ({
+          ...d,
+          x: Math.random() * innerWidth,
+          y: Math.random() * innerHeight
+        }));
 
       const simulation = d3.forceSimulation(simulationData)
         .force('x', d3.forceX(innerWidth / 2).strength(0.05))
@@ -61,8 +61,8 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
         .attr("id", "legendGradient")
         .attr("x1", "0%")
         .attr("x2", "0%")
-        .attr("y1", "0%")
-        .attr("y2", "100%");
+        .attr("y2", "0%")
+        .attr("y1", "100%");
 
       for (let i = 0; i <= 10; i++) {
         legendGradient.append("stop")
@@ -71,13 +71,13 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
           .attr("stop-opacity", 1);
       }
 
+      // add legend
       const legend = svg.append("rect")
         .attr("x", margin.left)
         .attr("y", margin.top)
         .attr("width", 20)
         .attr("height", innerHeight)
         .style("fill", "url(#legendGradient)");
-
 
       const g = svg.append('g')
         .attr('transform', `translate(${margin.left + legendWidth},${margin.top})`);
@@ -90,11 +90,17 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
 
       g.selectAll("circle")
         .data(simulationData)
-        .enter().append("circle")
+        .enter()
+        .append("circle")
+        .attr('cx', innerWidth / 2)
+        .attr("cy", innerHeight / 2)
+        .transition()
+        .duration(300)
         .attr("cx", d => d.x)
         .attr("cy", d => d.y)
         .attr("r", d => radiusScale (d[attr1Name]))
-        .attr("fill", d => colorScale(d[attr2Name]));
+        .attr("fill", d => colorScale(d[attr2Name]))
+        ;
 
       g.selectAll("text")
         .data(simulationData)
@@ -107,17 +113,29 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name}) => {
         .text(d => d[attr3Name]);
 
     g.append('text')
-        .attr('x', -legendWidth)
-        .attr('y', 10)
-        .attr('fill', 'black')
-        .text(`${numberFormat(d3.min(data, d => d[attr2Name]))}`);
-
-      g.append('text')
-        .attr('x', -legendWidth)
-        .attr('y', innerHeight + 15)
+        .attr('x', -legendWidth - 10)
+        .attr('y', -2)
         .attr('fill', 'black')
         .text(`${numberFormat(d3.max(data, d => d[attr2Name]))}`);
 
+      g.append('text')
+        .attr('x', -legendWidth - 10)
+        .attr('y', innerHeight + 15)
+        .attr('fill', 'black')
+        .text(`${numberFormat(d3.min(data, d => d[attr2Name]))}`);
+
+    // add title
+    g.append('text')
+        .attr('x', innerWidth / 2 - 100) 
+        .attr('y', -10)
+        .attr('fill', 'black')
+        .text(`Top 10 Route Traffic`);
+
+    g.append('text')
+        .attr('x', -legendWidth - 10)
+        .attr('y', -20)
+        .attr('fill', 'black')
+        .text(`Delay (Minutes)`);
     }
   }, [data]);
 

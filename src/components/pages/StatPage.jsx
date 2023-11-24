@@ -19,7 +19,7 @@ const RouteData = JSON.parse(RouteDataString); // [{}]
 
 // console.log(chartDataAggregator.getAirlineData(AirlineData, 1, 6));
 // console.log(chartDataAggregator.prepareAirlineStreamGraph(AirlineData, 1, 12, "TotalTraffic"));
-export const Summary = () => {
+export const StatPage = () => {
 
   // ***** Page2 States *******
 
@@ -71,27 +71,31 @@ export const Summary = () => {
   return (
     <div class="container">
       <div class="container-header">
-        <h1>Stats</h1>
-        <div>
-          This page shows different visualization on summary statistics.
-        </div>
+        <h1>Flgiht Summary Statistics</h1>
       </div>
-      <div class="sub-container">
-
+      <div>
+        <button onClick={() => changeSVG('bubbleChart')}>Show Bubble Chart</button>
+        <button onClick={() => changeSVG('streamChart')}>Show Stream Chart</button>
+        <button onClick={() => changeSVG('otherSVGType')}>Show Other SVG</button>
         {/* Add other filters here */}
-        <div>
-          <button onClick={() => changeSVG('bubbleChart')}>Show Bubble Chart</button>
-          <button onClick={() => changeSVG('streamChart')}>Show Stream Chart</button>
-          <button onClick={() => changeSVG('otherSVGType')}>Show Other SVG</button>
-        {/* Add buttons for other SVG types */}
+      </div>
+      <div>
+        <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}></DateRangePicker>
+      </div>
+      <div class="stat-container">
+        {/* chart menu */}
+
+        {/* SVG container */}
+        <div class="stat-sub-left">
+          <div class="svg-container">
+            {svgComponent}
+          </div>
         </div>
 
-        <div class="svg-container">
-          <div>
-            <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}></DateRangePicker>
-          </div>
-          {svgComponent}
+        {/* information container */}
+        <div class="stat-sub-right">
         </div>
+
       </div>
     </div>
   );
