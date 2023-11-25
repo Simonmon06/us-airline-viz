@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import { Constants } from "../commons/utils";
 
 // Colored Bubble Chart
 //   Produce a svg with bubbles randomly placed on the screen with radius and color defined by data
@@ -16,10 +17,8 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
     if (data && svgRef.current) {
       const svg = d3.select(svgRef.current);
 
-      // const width = 800;
-      // const height = 600;
-      const width = 700;
-      const height = 500;
+      const width = Constants.svgWidth;
+      const height = Constants.svgHeight;
       const legendWidth = 20;
 
       const margin = { top: 35, right: 20, bottom: 20, left: 40 };
@@ -165,8 +164,9 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
         .attr('x', innerWidth / 2 - 100)
         .attr('y', -10)
         .attr('fill', 'black')
+        .attr('font-size', '20px')
         .attr('font-weight', 'bold')
-        .text(`Top 10 Route Traffic`);
+        .text(`Route Traffic`);
 
       // add legend title
       g.append('text')

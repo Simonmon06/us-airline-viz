@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router-dom';
 
-
-
 // *********  Utilities  *********
 import DateRangePicker from '../commons/DateRangePicker/DateRangePicker';
-import { chartDataAggregator, appConstants } from '../commons/utils';
+import { chartDataAggregator, Constants } from '../commons/utils';
 
 // *********  Charts  *********
 import BubbleChart from "../charts/ColoredBubbleChart";
@@ -20,19 +18,13 @@ import { Button, ButtonGroup } from 'react-bootstrap';
 const AirlineData = JSON.parse(AirlineDataString); // [{}]
 const RouteData = JSON.parse(RouteDataString); // [{}]
 
-
-
-
 export const StatPage = () => {
-
-  // ***** Page2 States *******
-
   // init svg type
   const [selectedSVG, setSelectedSVG] = useState('bubbleChart'); // Initial state for BubbleChart
 
   // init date range
-  const [startMonth, setStartMonth] = useState(appConstants.initStartMonth); // init: March
-  const [endMonth, setEndMonth] = useState(appConstants.initEndMonth); // init: June
+  const [startMonth, setStartMonth] = useState(Constants.initStartMonth); // init: March
+  const [endMonth, setEndMonth] = useState(Constants.initEndMonth); // init: June
 
   // init chart data
   const [bubbleData, setBubbleData] = useState(chartDataAggregator.getRouteData(RouteData, startMonth, endMonth));
@@ -46,7 +38,7 @@ export const StatPage = () => {
 
   function myClickFn(e) {
     var chart_type = e.target.getAttribute('type');
-    if (chart_type === 'bubble') { 
+    if (chart_type === 'bubble') {
       changeSVG('bubbleChart')
     } else {
       changeSVG('streamChart')
@@ -93,7 +85,7 @@ export const StatPage = () => {
         <ButtonGroup size="lg" className="mb-2">
           <Button variant="pug" type="bubble" onClick={myClickFn}>Route Traffic</Button>
           <Button variant="pug" type="stream" onClick={myClickFn}>Airline Traffic</Button>
-          <Button variant="pug" type="placeholder" style={{pointEvents: "none", cursor: "default"}}>More</Button>
+          <Button variant="pug" type="placeholder" style={{ pointEvents: "none", cursor: "default" }}>More</Button>
         </ButtonGroup>
       </div>
       <div>

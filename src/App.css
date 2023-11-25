@@ -31,12 +31,16 @@
   flex-wrap: wrap;
   flex-direction: row;
   justify-content: space-between;
+
+  padding: 5px;
+  /* border: solid 1px; */
+  background-color: #0d0d0d0f;
 }
 
 .stat-sub-left {
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: 80%;
   flex: 1;
   order: 1;
 }
@@ -45,9 +49,10 @@
   display: flex;
   flex-direction: column;
   margin-right: 2%;
-  width: 30%;
+  width: 20%;
   flex: 1;
   order: 2;
+  padding-left: 25px;
 }
 
 #stat-description-div {

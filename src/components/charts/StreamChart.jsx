@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as d3 from 'd3';
 
+import { Constants } from "../commons/utils";
+
 // https://d3-graph-gallery.com/graph/streamgraph_template.html
 
 const Int2M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -21,8 +23,8 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
             const keys = Object.keys(data[0]).slice(1);
 
             // svg size
-            const width = 750;
-            const height = 450;
+            const width = Constants.svgWidth;
+            const height = Constants.svgHeight;
             const margin = { top: 10, right: 20, bottom: 20, left: 20 };
             const leftOffSet = 10; // show complete tick label for streamgraph
 
@@ -91,6 +93,11 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .keys(keys)
                     (data)
 
+                svg.append('text').text('click to record')
+                    .attr('x', innerWidth - 100).attr('y', 20)
+                    .style('fill', 'orange')
+                    .style('font-style', 'italic');
+
                 // Draw streams!
                 let area = d3.area()
                     .x(function (d) { return x(d.data.Month); })
@@ -101,7 +108,9 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .data(stackedData)
                     .join("path")
                     .attr("class", "myArea")
-                    .style("fill", function (d) { return color(d.key); })
+                    .style("fill", function (d) { return color(d.key); });
+
+                myAreas
                     .attr("d", area)
                     .attr("transform", `translate(${leftOffSet}, 0)`);
 
@@ -111,16 +120,15 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     const Descrption = d3.select('#stat-description-div').html('');
                     let tmp = "";
                     if (d) {
-                        let tableData = d.map((x)=>{return [Int2M[x.data.Month - 1], x.data[d.key]]});
+                        let tableData = d.map((x) => { return [Int2M[x.data.Month - 1], x.data[d.key]] });
                         let _table = tableData.reduce((acc, item) =>
-                                acc + `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`, "");
+                            acc + `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`, "");
                         _table = `<table><tr><th>Month</th><th>Traffic</th></tr>${_table}</table>`;
                         tmp = `<div style="font-weight: bold;">Airline: ${d.key}</div>
                             <br><div>${_table}</div>`;
                     }
                     Descrption.html(tmp);
                 }
-
                 // --> Lazy Tooltip
                 let InfoTip = svg
                     .append("text")
@@ -129,10 +137,6 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .style('fill', 'red')
                     .style("font-size", 15);
 
-                svg.append('text').text('click to record')
-                    .attr('x', innerWidth - 100).attr('y', 20)
-                    .style('font-style', 'italic');
-
                 // --> Mouse Actions 
                 const mouseover = function (event, d) {
                     d3.selectAll(".myArea").style("opacity", .2);
@@ -140,7 +144,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                         .style("stroke", "black")
                         .style("opacity", 1);
                 }
-                const mousemove = function (event, d, i) { updateTable(d); } 
+                const mousemove = function (event, d, i) { updateTable(d); }
                 const mouseleave = function (event, d) {
                     d3.selectAll(".myArea").style("opacity", 1).style("stroke", "none")
                     updateTable(fixed_table);
@@ -151,7 +155,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     updateTable(fixed_table);
                     // show temp tooltip
                     InfoTip
-                        .style('opacity', 1) 
+                        .style('opacity', 1)
                         .attr("x", (d3.pointer(event)[0] + 15) + "px")
                         .attr("y", (d3.pointer(event)[1] - 5) + "px")
                         .transition()
@@ -181,10 +185,10 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                 const y = d3.scaleLinear()
                     .domain([0, 20000])
                     .range([innerHeight, 0]);
-                
+
                 svg.append("g")
                     .attr("transform", "translate(" + 0.5 * leftOffSet + ", 0)")
-                    .call(d3.axisLeft(y).tickFormat((d, i)=>{ return d/1000 + "k"}));
+                    .call(d3.axisLeft(y).tickFormat((d, i) => { return d / 1000 + "k" }));
 
                 // Another scale for subgroup position?
                 var xSubgroup = d3.scaleBand()
@@ -197,26 +201,35 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .domain(keys)
                     .range(COLOR_PALETTE);
 
-                // Show the bars
-                svg.append("g")
-                    .selectAll("g")
-                    // Enter in data = loop group per group
-                    .data(data)
-                    .enter()
-                    .append("g")
-                    .attr("transform", function (d) { return "translate(" + x(Int2M[d.Month - 1]) + ",0)"; })
-                    .selectAll("rect")
-                    .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
-                    .enter().append("rect")
-                    .attr("x", function (d) { return xSubgroup(d.key); })
-                    .attr("y", function (d) { return y(d.value); })
-                    .attr("width", xSubgroup.bandwidth())
-                    .attr("height", function (d) { return innerHeight - y(d.value); })
-                    .attr("fill", function (d) { return color(d.key); });
+                const myBars =
+                    svg.append("g")
+                        .selectAll("g")
+                        // Enter in data = loop group per group
+                        .data(data)
+                        .enter()
+                        .append("g")
+                        .attr("transform", function (d) { return "translate(" + x(Int2M[d.Month - 1]) + ",0)"; })
+                        .selectAll("rect")
+                        .data(function (d) {
+                            return keys.map(function (key) {
+                                return {
+                                    key: key, value: d[key],
+                                    month: Int2M[d.Month - 1]
+                                };
+                            });
+                        })
+                        .enter().append("rect")
+                        .attr("class", "bar-item")
+                        .attr("x", function (d) { return xSubgroup(d.key); })
+                        .attr("y", function (d) { return y(d.value); })
+                        .attr("width", xSubgroup.bandwidth())
+                        .attr("height", function (d) { return innerHeight - y(d.value); })
+                        .attr("fill", function (d) { return color(d.key); });
 
+                // ************ legend bars
                 var legend = svg.append("g")
                     .attr("class", "legend")
-                    .attr("transform", "translate(" + (width - 500) + ", 0)");
+                    .attr("transform", "translate(" + (width - 250) + ", 0)");
 
                 // Bind the color domain to the legend container
                 var legendItems = legend.selectAll(".legend-item")
@@ -243,9 +256,47 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                         return d;
                     });
 
+                const mouseover = (event, d, i) => {
+                    let others = svg.selectAll("rect.bar-item").filter((item) => { return item.key !== d.key });
+                    let same = Array.from(svg.selectAll("rect.bar-item").filter((item) => { return item.key === d.key }));
+                    let otherLegends = svg.selectAll('.legend-item > rect').filter(x => x !== d.key);
+
+                    // update UI
+                    others.style("opacity", .2);
+                    otherLegends.style("opacity", .2);
+
+                    // update state
+                    let tableData = same.map((x) => { return [x.__data__.month, x.__data__.value] });
+                    let _table = tableData.reduce((acc, item) =>
+                        acc + `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`, "");
+                    _table = `<table><tr><th>Month</th><th>Traffic</th></tr>${_table}</table>`;
+                    _table = `<div style="font-weight: bold;">Airline: ${d.key}</div>
+                        <br><div>${_table}</div>`;
+                    const Descrption = d3.select('#stat-description-div').html('');
+                    Descrption.html(`<div>${_table}</div>`);
+                }
+
+                const mouseleave = (event, d, i) => {
+                    svg.selectAll("rect").style("opacity", 1);
+                }
+
+                // add mouse events 
+                myBars.on('mouseover', mouseover)
+                    .on('mouseleave', mouseleave);
+
 
             } // end if
+
+            // add title
+            svg.append('text')
+                .attr('x', innerWidth / 2 - 50)
+                .attr('y', 10)
+                .attr('fill', 'black')
+                .attr('font-size', '20px')
+                .attr('font-weight', 'bold')
+                .text(`Airline Traffic`);
         }
+
     }, [data, isBarplot]);
     return (
         <svg ref={svgRef}></svg>

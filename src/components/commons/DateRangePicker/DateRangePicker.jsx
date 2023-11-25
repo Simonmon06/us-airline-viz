@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import MultiRangeSlider from "multi-range-slider-react";
 import classes from "./DateRangePicker.modules.css"
-import { appConstants } from "../utils";
+import { Constants } from "../utils";
 
 export default function DateRangePicker({initStart, initEnd, handleChange}) {
 
@@ -13,8 +13,8 @@ export default function DateRangePicker({initStart, initEnd, handleChange}) {
   const [maxValue, setMaxValue] = useState(initEnd);
 
   // on change: after values set
-  const [minValue2, setMinValue2] = useState(appConstants.initStartMonth);
-  const [maxValue2, setMaxValue2] = useState(appConstants.initEndMonth);
+  const [minValue2, setMinValue2] = useState(Constants.initStartMonth);
+  const [maxValue2, setMaxValue2] = useState(Constants.initEndMonth);
 
   const [minCaption, set_minCaption] = useState("");
   const [maxCaption, set_maxCaption] = useState("");

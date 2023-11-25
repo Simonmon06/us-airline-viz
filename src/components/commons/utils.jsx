@@ -42,9 +42,11 @@ class chartDataAggregator {
 
 }
 
-const appConstants = {
+const Constants = {
     initStartMonth: 2,
-    initEndMonth: 5
+    initEndMonth: 5,
+    svgWidth: 700,
+    svgHeight: 500
 }
 
-export { chartDataAggregator, appConstants }
+export { chartDataAggregator, Constants }
