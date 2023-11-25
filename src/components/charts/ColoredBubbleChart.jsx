@@ -115,17 +115,12 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
 
       var mousemove = function (e, d) {
         var _html = `
-          <div>
-            <br>Route: </br>${d.route}
-          </div>
-          <div>
-            <br>Total Traffic: </br> ${d.traffic}
-          </div>
-          <div>
-            <br>Avg Delay: </br> ${d.delay}
-          </div>
+          <div style="font-weight: bold;">Route: ${d.route}</div>
+          <br>
+          <div>Total Traffic: ${d.traffic}</div>
+          <br>
+          <div>Avg Delay: ${d.delay}</div>
         `
-
         Tooltip
           .html(_html)
           .style("left", (d3.pointer(this)[0] + 70) + "px")

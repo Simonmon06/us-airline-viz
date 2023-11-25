@@ -14,41 +14,41 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
 
     useEffect(() => {
         if (data && svgRef.current) {
-            const svg = d3.select(svgRef.current);
-
-            const keys = Object.keys(data[0]).slice(1);
-            const width = 750;
-            const height = 400;
-            const leftOffSet = 10;
-
-            const margin = { top: 35, right: 20, bottom: 20, left: 40 };
-            const innerWidth = width - margin.left - margin.right;
-            const innerHeight = height - margin.top - margin.bottom;
-
+            let svg = d3.select(svgRef.current);
             svg.selectAll("*").remove(); // Clear previous content
-            svg.attr("width", innerWidth + margin.left + margin.right)
+
+            // keys: ['Airline', 'TotalTraffic', 'DomesticTraffic', 'InternationalTraffic']
+            const keys = Object.keys(data[0]).slice(1);
+
+            // svg size
+            const width = 750;
+            const height = 450;
+            const margin = { top: 10, right: 20, bottom: 20, left: 20 };
+            const leftOffSet = 10; // show complete tick label for streamgraph
+
+            // svg inner size
+            let innerWidth = width - margin.left - margin.right;
+            let innerHeight = height - margin.top - margin.bottom;
+
+            // refresh svg, re-create
+            svg = svg.attr("width", innerWidth + margin.left + margin.right)
                 .attr("height", innerHeight + margin.top + margin.bottom)
                 .append("g")
-                .attr("transform",
-                    "translate(" + margin.left + "," + margin.top + ")");
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            // switch button
-            var buttonContainer = svg.append("foreignObject")
+            // sub-type switch button
+            const buttonContainer = svg.append("foreignObject")
                 .attr("width", 150)
                 .attr("height", 30)
                 .attr("x", 10)
                 .attr("y", 10)
                 .append("xhtml:body")
                 .html(`<button style='width:100%; height:100%;'>${isBarplot ? 'View Streamgraph' : 'View Barplot'}</button>`);
-
-            // Add an event listener to the button
             buttonContainer.select("button")
-                .on("click", function () {
-                    setisBarplot(!isBarplot);
-                });
+                .on("click", function () { setisBarplot(!isBarplot); });
 
+            // create chart 
             if (isBarplot === false) {
-
                 // set the dimensions and margins of the graph
                 let [x_min, x_max] = d3.extent(data, function (d) { return d.Month; });
 
@@ -56,9 +56,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                 const x = d3.scaleLinear()
                     .domain([x_min, x_max])
                     .range([0, innerWidth]);
-
                 let myTicks = Array.from({ length: x_max - x_min + 1 }, (_, index) => index + x_min);
-
                 svg.append("g")
                     .attr("transform", `translate(${leftOffSet}, ${height * 0.8})`)
                     .call(
@@ -68,20 +66,18 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     )
                     .select(".domain")
                     .remove();
-
-                // Customization
                 svg.selectAll(".tick line").attr("stroke", "#b8b8b8")
 
                 // Add X axis label:
                 svg.append("text")
                     .attr("text-anchor", "end")
-                    .attr("x", width)
+                    .attr("x", width - innerWidth / 2)
                     .attr("y", height - 20)
                     .text("Time (month)");
 
                 // Add Y axis
                 const y = d3.scaleLinear()
-                    .domain([-50000, 50000])
+                    .domain([-40000, 35000])
                     .range([height, 0]);
 
                 // color palette
@@ -90,78 +86,105 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .range(COLOR_PALETTE);
 
                 //stack the data?
-                const stackedData = d3.stack()
+                let stackedData = d3.stack()
                     .offset(d3.stackOffsetSilhouette)
                     .keys(keys)
                     (data)
 
-                // create a tooltip
-                const Tooltip = svg
-                    .append("text")
-                    .attr("x", margin.left + 100 + leftOffSet)
-                    .attr("y", margin.top)
-                    .style('font-weight', 'bold')
-                    .style("opacity", 0)
-                    .style("font-size", 17)
-
-                // Three function that change the tooltip when user hover / move / leave a cell
-                const mouseover = function (event, d) {
-                    Tooltip.style("opacity", 1);
-                    d3.selectAll(".myArea").style("opacity", .2);
-                    d3.select(this)
-                        .style("stroke", "black")
-                        .style("opacity", 1);
-
-                    // console.log(d)
-                }
-
-                const mousemove = function (event, d, i) {
-                    let grp = d.key
-                    Tooltip.text(grp)
-                }
-                const mouseleave = function (event, d) {
-                    Tooltip.style("opacity", 0)
-                    d3.selectAll(".myArea").style("opacity", 1).style("stroke", "none")
-                }
-
-                // Area generator
-                const area = d3.area()
+                // Draw streams!
+                let area = d3.area()
                     .x(function (d) { return x(d.data.Month); })
                     .y0(function (d) { return y(d[0]); })
                     .y1(function (d) { return y(d[1]); });
 
-                // Show the areas
-                svg.selectAll("mylayers")
+                let myAreas = svg.selectAll("mylayers")
                     .data(stackedData)
                     .join("path")
                     .attr("class", "myArea")
                     .style("fill", function (d) { return color(d.key); })
                     .attr("d", area)
-                    .attr("transform", `translate(${leftOffSet}, 0)`)
-                    .on("mouseover", mouseover)
+                    .attr("transform", `translate(${leftOffSet}, 0)`);
+
+                // *********** INTERACTIONS **************
+                let fixed_table = null;
+                function updateTable(d) {
+                    const Descrption = d3.select('#stat-description-div').html('');
+                    let tmp = "";
+                    if (d) {
+                        let tableData = d.map((x)=>{return [Int2M[x.data.Month - 1], x.data[d.key]]});
+                        let _table = tableData.reduce((acc, item) =>
+                                acc + `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`, "");
+                        _table = `<table><tr><th>Month</th><th>Traffic</th></tr>${_table}</table>`;
+                        tmp = `<div style="font-weight: bold;">Airline: ${d.key}</div>
+                            <br><div>${_table}</div>`;
+                    }
+                    Descrption.html(tmp);
+                }
+
+                // --> Lazy Tooltip
+                let InfoTip = svg
+                    .append("text")
+                    .style("opacity", 0)
+                    .text('recorded!')
+                    .style('fill', 'red')
+                    .style("font-size", 15);
+
+                svg.append('text').text('click to record')
+                    .attr('x', innerWidth - 100).attr('y', 20)
+                    .style('font-style', 'italic');
+
+                // --> Mouse Actions 
+                const mouseover = function (event, d) {
+                    d3.selectAll(".myArea").style("opacity", .2);
+                    d3.select(this)
+                        .style("stroke", "black")
+                        .style("opacity", 1);
+                }
+                const mousemove = function (event, d, i) { updateTable(d); } 
+                const mouseleave = function (event, d) {
+                    d3.selectAll(".myArea").style("opacity", 1).style("stroke", "none")
+                    updateTable(fixed_table);
+                }
+
+                const mouselick = function (event, d) {
+                    fixed_table = d;
+                    updateTable(fixed_table);
+                    // show temp tooltip
+                    InfoTip
+                        .style('opacity', 1) 
+                        .attr("x", (d3.pointer(event)[0] + 15) + "px")
+                        .attr("y", (d3.pointer(event)[1] - 5) + "px")
+                        .transition()
+                        .duration(1500).style("opacity", 0);
+                }
+
+                myAreas.on("mouseover", mouseover)
                     .on("mousemove", mousemove)
-                    .on("mouseleave", mouseleave);
+                    .on("mouseleave", mouseleave)
+                    .on("click", mouselick);
 
             } else {
                 // multiseries bar pot
                 // Add X axis
-                var months = data.map(d => (d.Month));
+                let months = data.map(d => (Int2M[d.Month - 1]));
 
-                var x = d3.scaleBand()
+                const x = d3.scaleBand()
                     .domain(months)
-                    .range([0, width])
+                    .range([0, innerWidth])
                     .padding([0.2]);
 
                 svg.append("g")
-                    .attr("transform", "translate(0," + height + ")")
+                    .attr("transform", "translate(0," + innerHeight + ")")
                     .call(d3.axisBottom(x).tickSize(0));
 
                 // Add Y axis
-                var y = d3.scaleLinear()
+                const y = d3.scaleLinear()
                     .domain([0, 20000])
-                    .range([height, 0]);
+                    .range([innerHeight, 0]);
+                
                 svg.append("g")
-                    .call(d3.axisLeft(y));
+                    .attr("transform", "translate(" + 0.5 * leftOffSet + ", 0)")
+                    .call(d3.axisLeft(y).tickFormat((d, i)=>{ return d/1000 + "k"}));
 
                 // Another scale for subgroup position?
                 var xSubgroup = d3.scaleBand()
@@ -181,14 +204,14 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .data(data)
                     .enter()
                     .append("g")
-                    .attr("transform", function (d) { return "translate(" + x(d.Month) + ",0)"; })
+                    .attr("transform", function (d) { return "translate(" + x(Int2M[d.Month - 1]) + ",0)"; })
                     .selectAll("rect")
                     .data(function (d) { return keys.map(function (key) { return { key: key, value: d[key] }; }); })
                     .enter().append("rect")
                     .attr("x", function (d) { return xSubgroup(d.key); })
                     .attr("y", function (d) { return y(d.value); })
                     .attr("width", xSubgroup.bandwidth())
-                    .attr("height", function (d) { return height - y(d.value); })
+                    .attr("height", function (d) { return innerHeight - y(d.value); })
                     .attr("fill", function (d) { return color(d.key); });
 
                 var legend = svg.append("g")
@@ -203,6 +226,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .attr("transform", function (d, i) {
                         return "translate(0," + i * 20 + ")";
                     });
+
                 // Append colored squares to represent each series in the legend
                 legendItems.append("rect")
                     .attr("width", 18)
