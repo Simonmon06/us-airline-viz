@@ -12,7 +12,7 @@
   width: 100%;
 }
 
-.container-header h1 {
+.container-header h2 {
   font-size: 1.5rem;
   font-weight: bold;
 }
@@ -56,11 +56,13 @@
 }
 
 #stat-description-div {
-  border: "1px solid black";
   margin-top: 1px;
   min-height: 40%;
   padding: 5px;
-
+  background-color: #e3ffa8;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 5px 0px
   .div { margin-top: 5px;}
 }
 

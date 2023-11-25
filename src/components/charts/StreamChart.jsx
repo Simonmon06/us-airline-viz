@@ -292,7 +292,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                 .attr('x', innerWidth / 2 - 50)
                 .attr('y', 10)
                 .attr('fill', 'black')
-                .attr('font-size', '20px')
+                .attr('font-size', '1.5rem')
                 .attr('font-weight', 'bold')
                 .text(`Airline Traffic`);
         }

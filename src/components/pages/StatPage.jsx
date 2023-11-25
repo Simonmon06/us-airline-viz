@@ -109,8 +109,7 @@ export const StatPage = () => {
           <div>
             <h2 style={{ margin: "none", marginTop: "5px" }}>Details</h2>
           </div>
-          <div id="stat-description-div"
-            style={{ border: "1px solid black", marginTop: "1px", marginRight: "1%", minHeight: "40%" }}></div>
+          <div id="stat-description-div"></div>
         </div>
 
       </div>

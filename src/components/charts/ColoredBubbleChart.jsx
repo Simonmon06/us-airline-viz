@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { Constants } from "../commons/utils";
+import CodeToAirportData from '../../data/airport_code_to_name.json';
+console.log(CodeToAirportData)
 
 // Colored Bubble Chart
 //   Produce a svg with bubbles randomly placed on the screen with radius and color defined by data
@@ -108,13 +110,20 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
       // stat tooltip
       const Tooltip = d3.select('#stat-description-div').html('');
 
-      var mouseover = function (e, d) {
+      const mouseover = function (e, d) {
         d3.select(this).style("stroke", "black").style("opacity", 1)
       }
 
-      var mousemove = function (e, d) {
-        var _html = `
+      const mousemove = function (e, d) {
+
+        let [org, des] = d.route.split('-');
+        let org_city = CodeToAirportData.hasOwnProperty(org) ? CodeToAirportData[org] : 'unknown';
+        let des_city = CodeToAirportData.hasOwnProperty(des) ? CodeToAirportData[des] : 'unknown';
+
+        let _html = `
           <div style="font-weight: bold;">Route: ${d.route}</div>
+          <br>
+          <div>${org_city} - ${des_city}</div>
           <br>
           <div>Total Traffic: ${d.traffic}</div>
           <br>
@@ -126,7 +135,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
           .style("top", (d3.pointer(this)[1]) + "px")
       }
 
-      var mouseleave = function (e, d) {
+      const mouseleave = function (e, d) {
         d3.select(this).style("stroke", "none").style("opacity", 0.8)
       }
 
@@ -141,6 +150,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
         .enter().append("text")
         .attr("x", d => d.x)
         .attr("y", d => d.y)
+        .attr('font-size', '0.8rem')
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
         .attr('fill', 'white')
@@ -164,7 +174,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
         .attr('x', innerWidth / 2 - 100)
         .attr('y', -10)
         .attr('fill', 'black')
-        .attr('font-size', '20px')
+        .attr('font-size', '1.5rem')
         .attr('font-weight', 'bold')
         .text(`Route Traffic`);
 
