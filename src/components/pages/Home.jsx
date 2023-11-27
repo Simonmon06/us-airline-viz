@@ -7,7 +7,8 @@ import routeFile from '../../data/route_data.json';
 import airLineFile from '../../data/airline_data.json'
 import metadata from '../../data/metadata.json'
 import exampleData from '../../data/us-state-capitals.json'
-
+import BarCharts from "../charts/BarCharts";
+import test_weather from '../../data/test_weather.json'
 
 export const Home = () => {
   const [routeData, setRouteData] = useState();
@@ -41,6 +42,13 @@ export const Home = () => {
   // console.log(topRoutesData)
   // console.log('topRoutes',topRoutes)
   // console.log('usMapData', usMapData)
-  return <UsMap topRoutesData={topRoutesData} usMapData={usMapData}/>;
+  return (
+    <div>
+      <UsMap topRoutesData={topRoutesData} usMapData={usMapData}/>
+      <BarCharts dataset={test_weather}/>
+    </div>
+
+  )
+
 
 };
