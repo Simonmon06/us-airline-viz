@@ -62,8 +62,29 @@
   background-color: #e3ffa8;
   padding: 1rem;
   border-radius: 8px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 5px 0px
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 5px 5px 0px;
   .div { margin-top: 5px;}
+}
+
+.RouteDescHeader {
+    border-spacing: 1;
+    border-collapse: collapse;
+    border-radius: 5px;
+    padding: 5px 10px;
+    background: #36304a;
+    font-family: OpenSans-Regular;
+    font-size: 15px;
+    color: #fff;
+    line-height: 1.2;
+    font-weight: bold;
+}
+
+.RouteDescBody {
+    border-radius: 10px;
+    border-spacing: 1;
+    border-collapse: collapse;
+    background-color: white;
+    padding: 20px;
 }
 
 @media (max-width: 864px) {

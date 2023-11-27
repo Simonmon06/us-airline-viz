@@ -2,7 +2,6 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import { Constants } from "../commons/utils";
 import CodeToAirportData from '../../data/airport_code_to_name.json';
-console.log(CodeToAirportData)
 
 // Colored Bubble Chart
 //   Produce a svg with bubbles randomly placed on the screen with radius and color defined by data
@@ -121,13 +120,15 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
         let des_city = CodeToAirportData.hasOwnProperty(des) ? CodeToAirportData[des] : 'unknown';
 
         let _html = `
-          <div style="font-weight: bold;">Route: ${d.route}</div>
+          <div class="RouteDescHeader">Route: ${d.route}</div>
           <br>
-          <div>${org_city} - ${des_city}</div>
-          <br>
-          <div>Total Traffic: ${d.traffic}</div>
-          <br>
-          <div>Avg Delay: ${d.delay}</div>
+          <div class="RouteDescBody">
+            <div>${org_city} - ${des_city}</div>
+            <br>
+            <div style="font-weight: bold;">Total Traffic: ${d.traffic}</div>
+            <br>
+            <div style="font-weight: bold;">Avg Delay: ${d.delay}</div>
+          </div>
         `
         Tooltip
           .html(_html)
@@ -154,7 +155,8 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
         .attr("text-anchor", "middle")
         .attr("alignment-baseline", "middle")
         .attr('fill', 'white')
-        .text(d => d[attr3Name]);
+        .text(d => d[attr3Name])
+        .attr('pointer-events', 'none');
 
       // add colormap legend text
       g.append('text')
@@ -184,6 +186,13 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
         .attr('y', -20)
         .attr('fill', 'black')
         .text(`Delay (Minutes)`);
+
+      // add axis
+      g.append("text")
+          .attr("text-anchor", "end")
+          .attr("x", width - 120)
+          .attr("y", margin.top - 10)
+          .text("Radius: Total Traffic");
     }
   }, [data]);
 

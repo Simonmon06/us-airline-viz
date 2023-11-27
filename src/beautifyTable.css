@@ -1,0 +1,38 @@
+table * {
+    position: relative;
+}
+
+.table0 {
+    & table {
+        border-spacing: 1;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        width: 100%;
+        margin: 0 auto;
+        position: relative;
+
+        & thead tr {
+            height: 2rem;
+            background: #36304a;
+
+            & th {
+                font-family: OpenSans-Regular;
+                font-size: 15px;
+                color: #fff;
+                line-height: 1.2;
+                font-weight: unset;
+            }
+        }
+
+        & tbody tr {
+            height: 2rem;
+            font-family: OpenSans-Regular;
+            font-size: 15px;
+            line-height: 1.2;
+            font-weight: unset;
+            text-align: center;
+        }
+    }
+}

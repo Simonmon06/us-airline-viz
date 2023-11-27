@@ -8,6 +8,31 @@ import { Constants } from "../commons/utils";
 const Int2M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const COLOR_PALETTE = d3.schemeDark2;
 
+function updateAirlineDescriptionText(tableData, airline_name) {
+    /* tableData: [[month, traffic], ]*/
+    if (tableData) {
+        let _tbody = tableData.reduce((acc, item) => acc + `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`, "");
+        let _table = `<table>
+                        <thead>
+                            <tr><th>Month</th><th>Traffic</th></tr>
+                        </thead>
+                        <tbody>
+                            ${_tbody}
+                        </tbody>
+                    </table>`;
+        let _html = `
+            <div>
+                <div style="font-weight: bold;">${airline_name}</div>
+                <br>
+                <div class="table0">${_table}</div>
+            </div>
+            `;
+        d3.select('#stat-description-div').html(_html);
+    } else {
+        d3.select('#stat-description-div').html("");
+    }
+}
+
 const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
 
     const svgRef = useRef();
@@ -50,6 +75,14 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                 .on("click", function () { setisBarplot(!isBarplot); });
 
             // create chart 
+            let selected_airline = [null, null];
+            // --> Lazy Tooltip
+            let InfoTip = svg
+                .append("text")
+                .style("opacity", 0)
+                .text('recorded!')
+                .style('fill', 'red')
+                .style("font-size", 15);
             if (isBarplot === false) {
                 // set the dimensions and margins of the graph
                 let [x_min, x_max] = d3.extent(data, function (d) { return d.Month; });
@@ -74,7 +107,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                 svg.append("text")
                     .attr("text-anchor", "end")
                     .attr("x", width - innerWidth / 2)
-                    .attr("y", height - 20)
+                    .attr("y", height - 40)
                     .text("Time (month)");
 
                 // Add Y axis
@@ -115,27 +148,12 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                     .attr("transform", `translate(${leftOffSet}, 0)`);
 
                 // *********** INTERACTIONS **************
-                let fixed_table = null;
-                function updateTable(d) {
-                    const Descrption = d3.select('#stat-description-div').html('');
-                    let tmp = "";
-                    if (d) {
-                        let tableData = d.map((x) => { return [Int2M[x.data.Month - 1], x.data[d.key]] });
-                        let _table = tableData.reduce((acc, item) =>
-                            acc + `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`, "");
-                        _table = `<table><tr><th>Month</th><th>Traffic</th></tr>${_table}</table>`;
-                        tmp = `<div style="font-weight: bold;">Airline: ${d.key}</div>
-                            <br><div>${_table}</div>`;
+                function updateTable(selected_airline) {
+                    d3.select('#stat-description-div').html('');
+                    if (selected_airline[0]) {
+                        updateAirlineDescriptionText(selected_airline[1], selected_airline[0]);
                     }
-                    Descrption.html(tmp);
                 }
-                // --> Lazy Tooltip
-                let InfoTip = svg
-                    .append("text")
-                    .style("opacity", 0)
-                    .text('recorded!')
-                    .style('fill', 'red')
-                    .style("font-size", 15);
 
                 // --> Mouse Actions 
                 const mouseover = function (event, d) {
@@ -144,15 +162,19 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                         .style("stroke", "black")
                         .style("opacity", 1);
                 }
-                const mousemove = function (event, d, i) { updateTable(d); }
+                const mousemove = function (event, d, i) { 
+                    let tableData = d.map((x) => { return [Int2M[x.data.Month - 1], x.data[d.key]] });
+                    updateTable([d.key, tableData]); 
+                }
                 const mouseleave = function (event, d) {
                     d3.selectAll(".myArea").style("opacity", 1).style("stroke", "none")
-                    updateTable(fixed_table);
+                    updateTable(selected_airline);
                 }
 
                 const mouselick = function (event, d) {
-                    fixed_table = d;
-                    updateTable(fixed_table);
+                    let tableData = d.map((x) => { return [Int2M[x.data.Month - 1], x.data[d.key]] });
+                    selected_airline = [d.key, tableData];
+                    updateTable(selected_airline);
                     // show temp tooltip
                     InfoTip
                         .style('opacity', 1)
@@ -256,34 +278,55 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                         return d;
                     });
 
-                const mouseover = (event, d, i) => {
-                    let others = svg.selectAll("rect.bar-item").filter((item) => { return item.key !== d.key });
-                    let same = Array.from(svg.selectAll("rect.bar-item").filter((item) => { return item.key === d.key }));
-                    let otherLegends = svg.selectAll('.legend-item > rect').filter(x => x !== d.key);
-
-                    // update UI
-                    others.style("opacity", .2);
-                    otherLegends.style("opacity", .2);
-
-                    // update state
-                    let tableData = same.map((x) => { return [x.__data__.month, x.__data__.value] });
-                    let _table = tableData.reduce((acc, item) =>
-                        acc + `<tr><td>${item[0]}</td><td>${item[1]}</td></tr>`, "");
-                    _table = `<table><tr><th>Month</th><th>Traffic</th></tr>${_table}</table>`;
-                    _table = `<div style="font-weight: bold;">Airline: ${d.key}</div>
-                        <br><div>${_table}</div>`;
-                    const Descrption = d3.select('#stat-description-div').html('');
-                    Descrption.html(`<div>${_table}</div>`);
+                const updateTable = (selected_airline) => {
+                    d3.select('#stat-description-div').html("");
+                    if (selected_airline[0]) {  // airline selected
+                        updateAirlineDescriptionText(selected_airline[1], selected_airline[0])
+                    }
                 }
 
+                // hightlight selected airline legends 
+                const mouseover = (event, d, i) => {
+                    let others = svg.selectAll("rect.bar-item").filter((item) => { return item.key !== d.key });
+                    let otherLegends = svg.selectAll('.legend-item > rect').filter(x => x !== d.key);
+                    others.style("opacity", .2);
+                    otherLegends.style("opacity", .2);
+                }
+
+                // update information tabel temporarily
+                const mousemove = (e, d, i) => {
+                    let tableData = Array.from(svg.selectAll("rect.bar-item").filter(
+                        (item) => { return item.key === d.key }))
+                        .map((x) => { return [x.__data__.month, x.__data__.value] });
+                    updateTable([d.key, tableData]);
+                }
+
+                // restore information table to selected
                 const mouseleave = (event, d, i) => {
                     svg.selectAll("rect").style("opacity", 1);
+                    updateTable(selected_airline);
+                }
+
+                const mouselick = function (event, d) {
+                    let tableData = Array.from(svg.selectAll("rect.bar-item").filter(
+                        (item) => { return item.key === d.key }))
+                        .map((x) => { return [x.__data__.month, x.__data__.value] });
+                    selected_airline = [d.key, tableData]
+                    updateTable(selected_airline);
+
+                    InfoTip
+                        .style('opacity', 1)
+                        .attr("x", (d3.pointer(event)[0] + 15) + "px")
+                        .attr("y", (d3.pointer(event)[1] - 5) + "px")
+                        .transition()
+                        .duration(1500).style("opacity", 0);
                 }
 
                 // add mouse events 
                 myBars.on('mouseover', mouseover)
-                    .on('mouseleave', mouseleave);
-
+                    .on('mousemove', mousemove)
+                    .on('mouseleave', mouseleave)
+                    .on('click', mouselick);
 
             } // end if
 
