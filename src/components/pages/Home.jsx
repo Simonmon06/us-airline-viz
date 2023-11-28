@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import UsMap from "../charts/UsMap";
 import * as d3 from 'd3'
-import { getTopRoutes, filterRoutesByMonthRange } from './utils'; 
+import { getTopRoutes, filterRoutesByMonthRange, getUniqueAirportsData } from './utils'; 
 import us from '../../data/states-albers-10m.json';
 import routeFile from '../../data/route_data.json';
 import airLineFile from '../../data/airline_data.json'
@@ -19,6 +19,7 @@ export const Home = () => {
   const [topRoutesData, setTopRoutesData] = useState();
   const [usMapData, setUsMapData] = useState();
   const [airLineData, setAirLineData] = useState();
+  const [uniqueAirportsData, setUniqueAirportsData] = useState();
   // const [loading, setLoading] = useState(true);
   // init date range
   const [startMonth, setStartMonth] = useState(Constants.initStartMonth); // init: March
@@ -45,9 +46,7 @@ export const Home = () => {
       console.log('startMonth', startMonth)
 
       const filteredRoutesByMonth = filterRoutesByMonthRange(routeData, startMonth+1, endMonth+1)
-
       const topRoutesData = getTopRoutes(filteredRoutesByMonth, topK);
-
       const routesWithCoords = topRoutesData.map(route => {
       const [sourceCode, destCode] = route.Route.split('-');
     
@@ -60,7 +59,10 @@ export const Home = () => {
         };
       });
       
-      setTopRoutesData(routesWithCoords)
+      const uniqueAirports = getUniqueAirportsData(routesWithCoords, metadata)
+    
+      setTopRoutesData(routesWithCoords) 
+      setUniqueAirportsData(uniqueAirports)
     }
     
   }, [routeData, startMonth, endMonth, topK]);
@@ -88,7 +90,7 @@ export const Home = () => {
         <option value={30}>Top 30</option>
       </select>
 
-      <UsMap topRoutesData={topRoutesData} usMapData={usMapData}/>
+      <UsMap topRoutesData={topRoutesData} usMapData={usMapData} uniqueAirportsData={uniqueAirportsData}/>
       <BarCharts dataset={test_weather}/>
     </div>
 
