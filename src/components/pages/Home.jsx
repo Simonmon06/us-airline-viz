@@ -45,11 +45,11 @@ export const Home = () => {
       console.log('metadata', metadata)
       console.log('startMonth', startMonth)
 
-      const filteredRoutesByMonth = filterRoutesByMonthRange(routeData, startMonth+1, endMonth+1)
-      const topRoutesData = getTopRoutes(filteredRoutesByMonth, topK);
-      const routesWithCoords = topRoutesData.map(route => {
-      const [sourceCode, destCode] = route.Route.split('-');
-    
+      const topKRoutes = chartDataAggregator.getRouteData(routeData,  startMonth+1, endMonth+1, topK)
+      console.log(topKRoutes, 'topKRoutes')
+
+      const routesWithCoords = topKRoutes.map(route => {
+      const [sourceCode, destCode] = route.route.split('-');
       return {
           ...route,
           source: metadata.airport_coords[sourceCode],

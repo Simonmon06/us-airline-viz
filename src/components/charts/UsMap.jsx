@@ -5,15 +5,23 @@ import * as topojson from "topojson-client";
 const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
     const svgMapRef = useRef();
     useEffect(() => {
+        
         const path = d3.geoPath()
     
         const width =975
         const height = 610
         const projection = d3.geoAlbersUsa().scale(1300).translate([width/2, height/2])
-    
 
         let svg = null
         if (topRoutesData && usMapData && uniqueAirportsData && svgMapRef.current) {
+
+            const maxTraffic = Math.max(...topRoutesData.map(d => d.traffic));
+
+            const trafficScale = d3.scaleLinear()
+                .domain([0, maxTraffic]) // Input range from 0 to max traffic
+                .range([1, 10]); // Output range for stroke width; adjust as needed
+
+
             console.log('uniqueAirportsData', uniqueAirportsData)
             svg = d3.select(svgMapRef.current)
                 
@@ -52,60 +60,50 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
                     .attr('font-family', 'sans-serif')
                     .attr('font-size', 10)
                     .text(d => d.code);
+                    
+
+            function linkArc(d) {
+                const source = projection(d.source);
+                const target = projection(d.destination);
                 
-            // const pointsOnMap = svg.selectAll('g')
-            //     .data(uniqueAirportsData)
-            //     .join('g')
+                if (!source || !target) return ''; // Check if the projection is valid for both points
                 
-            // const airPortGroup = pointsOnMap.append('g')
-            // .attr('transform', d => `translate(${projection([d.coords[1], d.coords[0]]).join(',')})`);
-            // airPortGroup.append('circle')
-            // .attr('r', 2)
+            
+                const dx = target[0] - source[0],
+                      dy = target[1] - source[1],
+                      distance = Math.sqrt(dx * dx + dy * dy) 
 
+                const curvatureBase = 0.3;
 
-            // airportsGroup.append('circle')
-            //     .attr('r', 2);
-             
-            // airportsGroup.append('text')
-            //     .attr('y', -6)
-            //     .attr('text-anchor', 'middle')
-            //     .attr('font-family', 'sans-serif')
-            //     .attr('font-size', 10)
-            //     .text(d => d.code);
+                let curvature = curvatureBase * (1000 / distance);
 
-            // -------------------------------------------------------------------------------------------------------
-            // the code below draw the duplicate points for all source and dest
+                const sweep = (d.sourceCode < d.destCode) ? 0 : 1;
+                
+                // Calculate the arc's radius adjusted by the curvature
+                
+                const dr = Math.max(distance, distance * curvature);
 
-            // const pointsOnMap = svg.selectAll('g')
-            //     .data(topRoutesData)
-            //     .join('g');
-            //     // Plotting source points
-            // const sourceGroup = pointsOnMap.append('g')
-            // .attr('transform', d => `translate(${projection([d.source[1], d.source[0]]).join(',')})`);
-            // sourceGroup.append('circle')
-            // .attr('r', 2)
+                return `M${source[0]},${source[1]}A${dr},${dr} 0 0,${sweep} ${target[0]},${target[1]}`;
+            }
+            
+            // Draw the routes as arcs
+            const routesGroup = svg.append('g').attr('class', 'routes');
+            routesGroup.selectAll('path.route')
+                .data(topRoutesData)
+                .enter().append('path')
+                .attr('class', 'route')
+                .attr('d', (d) => linkArc({
+                    route: d.route,
+                    source: [d.source[1], d.source[0]],
+                    destination: [d.destination[1], d.destination[0]] 
+                },
+                )) 
+                .attr('fill', 'none')
+                .attr('stroke', (d) =>(d.sourceCode < d.destCode) ? 'orange' : 'red') // Alternate colors for the paths
+                .attr('stroke-width', d => trafficScale(d.traffic))
+                .attr('stroke-opacity', 0.6)
 
-            // sourceGroup.append('text')
-            //     .attr('y', -6)
-            //     .attr('text-anchor', 'middle')
-            //     .attr('font-family', 'sans-serif')
-            //     .attr('font-size', 10)
-            //     .text(d=> d.sourceCode)
-      
-            // // Plotting destination points
-            // const destGroup = pointsOnMap.append('g')
-            //     .attr('transform', d => `translate(${projection([d.destination[1], d.destination[0]]).join(',')})`);
-        
-            // destGroup.append('circle')
-            //     .attr('r', 2)
-        
-            // destGroup.append('text')
-            //     .attr('y', -6)
-            //     .attr('text-anchor', 'middle')
-            //     .attr('font-family', 'sans-serif')
-            //     .attr('font-size', 10)
-            //     .text(d=> d.destCode)
-
+ 
         }
     }, [topRoutesData])
 
