@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 
 const BarCharts = ({dataset}) => {
     const svgBarChartRef = useRef();
-    const [selectedMetric, setSelectedMetric] = useState('humidity');
+    const [selectedMetric, setSelectedMetric] = useState('traffic');
 
     const handleMetricChange = (event) => {
         setSelectedMetric(event.target.value);
@@ -43,7 +43,8 @@ const BarCharts = ({dataset}) => {
 
     function histogram(dataset, metric, dimensions, ctr) {
         console.log(metric)
-        const xAccessor = d => d.currently[metric]
+        console.log(dataset)
+        const xAccessor = d => d[metric]
         const yAccessor = d => d.length
     
         // Scales
@@ -138,8 +139,8 @@ const BarCharts = ({dataset}) => {
     return (
         <div>
         <select id="metric" onChange={handleMetricChange} value={selectedMetric}>
-            <option value="humidity">Humidity</option>
-            <option value="ozone">Ozone</option>
+            <option value="traffic">Traffic</option>
+            <option value="delay">Delay</option>
             {/* Add other options here */}
         </select>
         <svg ref={svgBarChartRef} ></svg>

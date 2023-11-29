@@ -77,8 +77,8 @@ export const StatPage = () => {
   }
   // Add more conditions for other SVG types as needed
   return (
-    <div class="container">
-      <div class="container-header">
+    <div class="my-container">
+      <div class="my-container-header">
         <h1>Flgiht Statistics</h1>
       </div>
       <div>

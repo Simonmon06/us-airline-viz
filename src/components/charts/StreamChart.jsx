@@ -70,7 +70,7 @@ const StreamChart = ({ data, xAttrName, yAttrName, labelAttrName }) => {
                 .attr("x", 10)
                 .attr("y", 10)
                 .append("xhtml:body")
-                .html(`<button style='width:100%; height:100%;'>${isBarplot ? 'View Streamgraph' : 'View Barplot'}</button>`);
+                .html(`<button style='width:100%; height:100%; font-size: 12px;'>${isBarplot ? 'View Streamgraph' : 'View Barplot'}</button>`);
             buttonContainer.select("button")
                 .on("click", function () { setisBarplot(!isBarplot); });
 

@@ -43,6 +43,8 @@ export const Home = () => {
 
   useEffect(() => {
 
+    console.log(topRoutesData)
+
     if(routeData) {
       console.log('airLineData', airLineData)
       console.log('routeData', routeData)
@@ -99,7 +101,7 @@ export const Home = () => {
       </div>
 
       <Row>
-        <Col md={{ span: 4, offset: 4 }}  className="mb-2" >
+        <Col md={1} className="mb-2" >
           <select value={topK} onChange={handleTopKChange} >
             <option value={1}>Top 1</option>
             <option value={5}>Top 5</option>
@@ -120,7 +122,7 @@ export const Home = () => {
       </Row>
 
       <UsMap topRoutesData={topRoutesData} usMapData={usMapData} uniqueAirportsData={uniqueAirportsData}/>
-      <BarCharts dataset={test_weather}/>
+      <BarCharts dataset={topRoutesData}/>
     </Container>
   );
   
