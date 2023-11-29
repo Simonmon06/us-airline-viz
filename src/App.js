@@ -5,6 +5,7 @@ import { Home } from './components/pages/Home';
 import { StatPage } from './components/pages/StatPage';
 // import { Page3 } from './components/pages/Page3';
 import './beautifyTable.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (

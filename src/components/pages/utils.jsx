@@ -4,12 +4,16 @@ export const getTopRoutes = (routeData, topX) => {
       .slice(0, topX);
 };
 
-export const filterRoutesByMonthRange = (routeData, startMonth, endMonth) => {
-  return routeData.filter(route =>{
-    const routeMonth = parseInt(route.Month)
-    return routeMonth >= startMonth && routeMonth <= endMonth
-  })
-}
+export const filterSelectedRoutesByMonthRange = (routeData, startMonth, endMonth, selectedRoute) => {
+  console.log('selectedRoute', selectedRoute)
+  return routeData.filter(route => {
+    const routeMonth = parseInt(route.Month, 10);
+    const isWithinMonthRange = routeMonth >= startMonth && routeMonth <= endMonth;
+    const isRouteSelected = route.Route === selectedRoute;
+
+    return isWithinMonthRange && isRouteSelected;
+  });
+};
 
 /**
  * Generates a unique list of airports from a dataset of routes.

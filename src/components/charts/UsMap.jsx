@@ -105,9 +105,6 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
                     .attr('font-family', 'sans-serif')
                     .attr('font-size', 10)
                     .text(d => d.code);
-                    
-
-
  
         }
     }, [topRoutesData])

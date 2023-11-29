@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import UsMap from "../charts/UsMap";
 import * as d3 from 'd3'
-import { getTopRoutes, filterRoutesByMonthRange, getUniqueAirportsData } from './utils'; 
+import { getTopRoutes, filterSelectedRoutesByMonthRange, getUniqueAirportsData } from './utils'; 
 import us from '../../data/states-albers-10m.json';
 import routeFile from '../../data/route_data.json';
 import airLineFile from '../../data/airline_data.json'
@@ -10,6 +10,8 @@ import exampleData from '../../data/us-state-capitals.json'
 import BarCharts from "../charts/BarCharts";
 import test_weather from '../../data/test_weather.json'
 import DateRangePicker from '../commons/DateRangePicker/DateRangePicker'
+import './Home.css';
+import { Container, Row, Col, Form } from 'react-bootstrap';
 
 import { chartDataAggregator, Constants } from '../commons/utils';
 
@@ -20,6 +22,8 @@ export const Home = () => {
   const [usMapData, setUsMapData] = useState();
   const [airLineData, setAirLineData] = useState();
   const [uniqueAirportsData, setUniqueAirportsData] = useState();
+  const [selectedRoute, setSelectedRoute] = useState('');
+
   // const [loading, setLoading] = useState(true);
   // init date range
   const [startMonth, setStartMonth] = useState(Constants.initStartMonth); // init: March
@@ -44,6 +48,10 @@ export const Home = () => {
       console.log('routeData', routeData)
       console.log('metadata', metadata)
       console.log('startMonth', startMonth)
+      if(selectedRoute){
+        const filteredData = filterSelectedRoutesByMonthRange(routeData, startMonth+1, endMonth+1, selectedRoute)
+        console.log('filteredData', filteredData) 
+      }
 
       const topKRoutes = chartDataAggregator.getRouteData(routeData,  startMonth+1, endMonth+1, topK)
       console.log(topKRoutes, 'topKRoutes')
@@ -65,9 +73,14 @@ export const Home = () => {
       setUniqueAirportsData(uniqueAirports)
     }
     
-  }, [routeData, startMonth, endMonth, topK]);
+  }, [routeData, startMonth, endMonth, topK, selectedRoute]);
 
 
+  // The handler to update the selected route
+  const handleRouteChange = (e) => {
+    setSelectedRoute(e.target.value);
+  };
+  
   const handleMonthChange = (values) => {
     setStartMonth(values[0]);
     setEndMonth(values[1]);
@@ -79,22 +92,38 @@ export const Home = () => {
 
   
   return (
-    <div>
-      <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}/>
-      <select value={topK} onChange={handleTopKChange}>
-        {/* Define dropdown options for top k */}
-        <option value={1}>Top 1</option>
-        <option value={5}>Top 5</option>
-        <option value={10}>Top 10</option>
-        <option value={20}>Top 20</option>
-        <option value={30}>Top 30</option>
-      </select>
+
+    <Container>
+      <div>
+        <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}/>
+      </div>
+
+      <Row>
+        <Col md={{ span: 4, offset: 4 }}  className="mb-2" >
+          <select value={topK} onChange={handleTopKChange} >
+            <option value={1}>Top 1</option>
+            <option value={5}>Top 5</option>
+            <option value={10}>Top 10</option>
+            <option value={20}>Top 20</option>
+            <option value={30}>Top 30</option>
+            <option value={50}>Top 50</option>
+          </select>
+        </Col>
+        <Col md={4} className="mb-2">
+          <select value={selectedRoute} onChange={handleRouteChange}>
+            <option value="">-- Select a Route --</option>
+              {topRoutesData && topRoutesData.map((routeData, index) => (
+                <option key={index} value={routeData.route}>{routeData.route}</option>
+              ))}
+            </select>
+        </Col>
+      </Row>
 
       <UsMap topRoutesData={topRoutesData} usMapData={usMapData} uniqueAirportsData={uniqueAirportsData}/>
       <BarCharts dataset={test_weather}/>
-    </div>
-
-  )
+    </Container>
+  );
+  
 
 
 };
