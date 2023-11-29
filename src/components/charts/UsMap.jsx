@@ -16,11 +16,13 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
         if (topRoutesData && usMapData && uniqueAirportsData && svgMapRef.current) {
 
             const maxTraffic = Math.max(...topRoutesData.map(d => d.traffic));
+            const minTraffic = Math.min(...topRoutesData.map(d => d.traffic));
 
-            const trafficScale = d3.scaleLinear()
-                .domain([0, maxTraffic]) // Input range from 0 to max traffic
-                .range([1, 10]); // Output range for stroke width; adjust as needed
-
+            const trafficScale = d3.scalePow()
+                .exponent(2) // Squaring the input to amplify differences
+                .domain([minTraffic, maxTraffic])
+                .range([2, 10]) // Adjust the range to get the desired visual effect
+                .clamp(true); 
 
             console.log('uniqueAirportsData', uniqueAirportsData)
             svg = d3.select(svgMapRef.current)
