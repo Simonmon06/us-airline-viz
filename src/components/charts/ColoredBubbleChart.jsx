@@ -127,7 +127,7 @@ const BubbleChart = ({ data, attr1Name, attr2Name, attr3Name }) => {
             <br>
             <div style="font-weight: bold;">Total Traffic: ${d.traffic}</div>
             <br>
-            <div style="font-weight: bold;">Avg Delay: ${d.delay}</div>
+            <div style="font-weight: bold;">Avg Delay: ${d.delay.toFixed(2)} Minutes</div>
           </div>
         `
         Tooltip
