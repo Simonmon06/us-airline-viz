@@ -5,6 +5,31 @@ import * as topojson from "topojson-client";
 const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
     const svgMapRef = useRef();
     useEffect(() => {
+
+        function linkArc(d) {
+            const source = projection(d.source);
+            const target = projection(d.destination);
+            
+            if (!source || !target) return ''; // Check if the projection is valid for both points
+            
+        
+            const dx = target[0] - source[0],
+                  dy = target[1] - source[1],
+                  distance = Math.sqrt(dx * dx + dy * dy) 
+
+            const curvatureBase = 0.3;
+
+            let curvature = curvatureBase * (1000 / distance);
+
+            const sweep = (d.sourceCode < d.destCode) ? 0 : 1;
+            
+            // Calculate the arc's radius adjusted by the curvature
+            
+            const dr = Math.max(distance, distance * curvature);
+
+            return `M${source[0]},${source[1]}A${dr},${dr} 0 0,${sweep} ${target[0]},${target[1]}`;
+        }
+
         
         const path = d3.geoPath()
     
@@ -45,6 +70,24 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
                 .attr('stroke-liinecap', 'round')
                 .attr('d', path(topojson.mesh(usMapData, usMapData.objects.states, (a, b)=> a !== b)))
         
+            
+            // Draw the routes as arcs
+            const routesGroup = svg.append('g').attr('class', 'routes');
+            routesGroup.selectAll('path.route')
+                .data(topRoutesData)
+                .enter().append('path')
+                .attr('class', 'route')
+                .attr('d', (d) => linkArc({
+                    route: d.route,
+                    source: [d.source[1], d.source[0]],
+                    destination: [d.destination[1], d.destination[0]] 
+                },
+                )) 
+                .attr('fill', 'none')
+                .attr('stroke', (d) =>(d.sourceCode < d.destCode) ? 'orange' : 'red') // Alternate colors for the paths
+                .attr('stroke-width', d => trafficScale(d.traffic))
+                .attr('stroke-opacity', 0.6)
+
 
             const airportsGroup = svg.selectAll('g.airport') // Ensure you select the correct existing groups
                 .data(uniqueAirportsData)
@@ -64,46 +107,6 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
                     .text(d => d.code);
                     
 
-            function linkArc(d) {
-                const source = projection(d.source);
-                const target = projection(d.destination);
-                
-                if (!source || !target) return ''; // Check if the projection is valid for both points
-                
-            
-                const dx = target[0] - source[0],
-                      dy = target[1] - source[1],
-                      distance = Math.sqrt(dx * dx + dy * dy) 
-
-                const curvatureBase = 0.3;
-
-                let curvature = curvatureBase * (1000 / distance);
-
-                const sweep = (d.sourceCode < d.destCode) ? 0 : 1;
-                
-                // Calculate the arc's radius adjusted by the curvature
-                
-                const dr = Math.max(distance, distance * curvature);
-
-                return `M${source[0]},${source[1]}A${dr},${dr} 0 0,${sweep} ${target[0]},${target[1]}`;
-            }
-            
-            // Draw the routes as arcs
-            const routesGroup = svg.append('g').attr('class', 'routes');
-            routesGroup.selectAll('path.route')
-                .data(topRoutesData)
-                .enter().append('path')
-                .attr('class', 'route')
-                .attr('d', (d) => linkArc({
-                    route: d.route,
-                    source: [d.source[1], d.source[0]],
-                    destination: [d.destination[1], d.destination[0]] 
-                },
-                )) 
-                .attr('fill', 'none')
-                .attr('stroke', (d) =>(d.sourceCode < d.destCode) ? 'orange' : 'red') // Alternate colors for the paths
-                .attr('stroke-width', d => trafficScale(d.traffic))
-                .attr('stroke-opacity', 0.6)
 
  
         }
