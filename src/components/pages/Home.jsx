@@ -43,20 +43,13 @@ export const Home = () => {
 
   useEffect(() => {
 
-    console.log(topRoutesData)
-
     if(routeData) {
-      console.log('airLineData', airLineData)
-      console.log('routeData', routeData)
-      console.log('metadata', metadata)
-      console.log('startMonth', startMonth)
       if(selectedRoute){
         const filteredData = filterSelectedRoutesByMonthRange(routeData, startMonth+1, endMonth+1, selectedRoute)
-        console.log('filteredData', filteredData) 
+        // console.log('filteredData', filteredData) 
       }
 
       const topKRoutes = chartDataAggregator.getRouteData(routeData,  startMonth+1, endMonth+1, topK)
-      console.log(topKRoutes, 'topKRoutes')
 
       const routesWithCoords = topKRoutes.map(route => {
       const [sourceCode, destCode] = route.route.split('-');
@@ -94,7 +87,6 @@ export const Home = () => {
 
   
   return (
-
     <Container>
       <div>
         <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}/>
