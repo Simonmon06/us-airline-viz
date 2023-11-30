@@ -93,10 +93,11 @@ export const Home = () => {
 
   
   return (
-    <div className="my-container">
+    <div className="my-container" id="mapContainer">
       <div>
         <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}/>
       </div>
+      <div id="mapTip"></div>
 
       <Row>
         <Col md={1} className="mb-2" >

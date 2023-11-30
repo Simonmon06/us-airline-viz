@@ -11,7 +11,7 @@ export const Navbar = () => {
        FlightAnalysis 
       </Link>
       <div>
-        <iframe style={{pointerEvents: "none"}} src="https://giphy.com/embed/BSx6mzbW1ew7K" width="80" height="50" frameBorder="0" class="giphy-embed"></iframe>
+        <iframe style={{pointerEvents: "none"}} src="https://giphy.com/embed/TlK63EvcvghyJU105zy" width="80" height="50" frameBorder="0" class="giphy-embed"></iframe>
       </div>
       <div className="menu" onClick={() => setMenuOpen(!menuOpen)}>
         <span></span>

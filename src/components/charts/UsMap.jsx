@@ -37,11 +37,24 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
         }
 
         const paintSavedArcSelection = () => {
+            const tooltipdiv = d3.select("#mapTip");
             if (selectedRoute !== "") {
-                setHighlightArc(d3.selectAll('path.route').filter(d => d.route === selectedRoute));
+                const foundRoutes = d3.selectAll('path.route').filter(d => d.route === selectedRoute);
+                setHighlightArc(foundRoutes);
                 setNormalArc(d3.selectAll('path.route').filter(d => d.route !== selectedRoute));
+
+                const data = foundRoutes.data()[0];
+                tooltipdiv
+                    .style('opacity', 1.0)
+                    .style("display", 'block')
+                    .html(`Route: ${data.route}<br/><br/>Traffic: ${data.traffic}<br/><br/>Delay: ${data.delay.toFixed(2)} Minutes`);
+
             } else {
                 setNormalArc(d3.selectAll('path.route'));
+                tooltipdiv
+                    .style('opacity', 1.0)
+                    .style("display", 'none')
+                    .html("");
             }
         }
  
@@ -67,22 +80,25 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
             svg = d3.select(svgMapRef.current)
             svg.selectAll("*").remove();
 
+            // glowing effect for arc highlights
             const defs = svg.append("defs");
-
-            // Create the filter with feGaussianBlur and feMerge
             const filter = defs.append("filter")
-            .attr("id", "glow");
+                .attr("id", "glow");
 
             filter.append("feGaussianBlur")
-            .attr("stdDeviation", 5)
-            .attr("result", "coloredBlur");
+                .attr("stdDeviation", 5)
+                .attr("result", "coloredBlur");
 
             const feMerge = filter.append("feMerge");
             feMerge.append("feMergeNode").attr("in", "coloredBlur");
             feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
+            // set up svg 
             svg.attr('width', width ).attr('height', height)
 
+            // set up info tip
+            const tooltipdiv = d3.select("#mapTip");
+ 
             // console.log('svg', svg)
             // console.log('usMapData', usMapData)
             // console.log('topRoutesData', topRoutesData)
@@ -154,9 +170,7 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
             .on('click', (e, d) => {
                 changeSelectedRoute("");
             })
-            
             paintSavedArcSelection();
- 
         }
     }, [topRoutesData])
 

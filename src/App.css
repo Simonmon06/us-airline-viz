@@ -126,3 +126,21 @@
 .btn.btn-pug:not([type="placeholder"]):hover{
   opacity: 1;
 }
+
+
+/* US MAP Tooltip */
+#mapTip {
+  background: rgba(69, 77, 93, 0.9);
+  border-radius: 0.2rem;
+  opacity: 1;
+  display: none;
+  top: 23%;
+  left: 55%;
+  color: rgb(255, 255, 255);
+  padding: 0.6rem;
+  position: absolute;
+  text-overflow: ellipsis;
+  white-space: pre;
+  line-height: 1em;
+  z-index: 300;
+}

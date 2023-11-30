@@ -78,9 +78,6 @@ export const StatPage = () => {
   // Add more conditions for other SVG types as needed
   return (
     <div class="my-container">
-      <div class="my-container-header">
-        <h1>Flgiht Statistics</h1>
-      </div>
       <div>
         <ButtonGroup size="lg" className="mb-2">
           <Button variant="pug" type="bubble" onClick={myClickFn}>Route Traffic</Button>
