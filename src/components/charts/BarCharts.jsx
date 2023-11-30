@@ -13,8 +13,8 @@ const BarCharts = ({dataset}) => {
 
 
         if (dataset && svgBarChartRef.current) {
-            console.log('drawing!!!!')
-            console.log('svgBarChartRef.current', svgBarChartRef.current)
+            // console.log('drawing!!!!')
+            // console.log('svgBarChartRef.current', svgBarChartRef.current)
             const svg = d3.select(svgBarChartRef.current);
             svg.selectAll("*").remove();
 
@@ -42,8 +42,8 @@ const BarCharts = ({dataset}) => {
     }, [dataset, selectedMetric])
 
     function histogram(dataset, metric, dimensions, ctr) {
-        console.log(metric)
-        console.log(dataset)
+        // console.log(metric)
+        // console.log(dataset)
         const xAccessor = d => d[metric]
         const yAccessor = d => d.length
     

@@ -6,12 +6,10 @@ import us from '../../data/states-albers-10m.json';
 import routeFile from '../../data/route_data.json';
 import airLineFile from '../../data/airline_data.json'
 import metadata from '../../data/metadata.json'
-import exampleData from '../../data/us-state-capitals.json'
 import BarCharts from "../charts/BarCharts";
-import test_weather from '../../data/test_weather.json'
 import DateRangePicker from '../commons/DateRangePicker/DateRangePicker'
 import './Home.css';
-import { Container, Row, Col, Form } from 'react-bootstrap';
+import { Container, Row, Col } from 'react-bootstrap';
 
 import { chartDataAggregator, Constants } from '../commons/utils';
 
@@ -46,7 +44,6 @@ export const Home = () => {
     if(routeData) {
       if(selectedRoute){
         const filteredData = filterSelectedRoutesByMonthRange(routeData, startMonth+1, endMonth+1, selectedRoute)
-        // console.log('filteredData', filteredData) 
       }
 
       const topKRoutes = chartDataAggregator.getRouteData(routeData,  startMonth+1, endMonth+1, topK)
@@ -75,6 +72,14 @@ export const Home = () => {
   const handleRouteChange = (e) => {
     setSelectedRoute(e.target.value);
   };
+
+  const changeSelectedRoute = (newValue) => {
+    if (topRoutesData.map(x=>x.route).includes(newValue) || newValue === '') {
+      setSelectedRoute(newValue);
+    } else {
+      alert('invalid click route selection.');
+    }
+  }
   
   const handleMonthChange = (values) => {
     setStartMonth(values[0]);
@@ -113,7 +118,8 @@ export const Home = () => {
         </Col>
       </Row>
 
-      <UsMap topRoutesData={topRoutesData} usMapData={usMapData} uniqueAirportsData={uniqueAirportsData}/>
+      <UsMap topRoutesData={topRoutesData} usMapData={usMapData} uniqueAirportsData={uniqueAirportsData}
+      selectedRoute={selectedRoute} changeSelectedRoute={changeSelectedRoute}/>
       <BarCharts dataset={topRoutesData}/>
     </Container>
   );

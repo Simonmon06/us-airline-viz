@@ -5,7 +5,7 @@ export const getTopRoutes = (routeData, topX) => {
 };
 
 export const filterSelectedRoutesByMonthRange = (routeData, startMonth, endMonth, selectedRoute) => {
-  console.log('selectedRoute', selectedRoute)
+  // console.log('selectedRoute', selectedRoute)
   return routeData.filter(route => {
     const routeMonth = parseInt(route.Month, 10);
     const isWithinMonthRange = routeMonth >= startMonth && routeMonth <= endMonth;

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
 import * as topojson from "topojson-client";
 
-const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
+const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, changeSelectedRoute}) => {
     const svgMapRef = useRef();
     useEffect(() => {
 
@@ -12,7 +12,6 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
             
             if (!source || !target) return ''; // Check if the projection is valid for both points
             
-        
             const dx = target[0] - source[0],
                   dy = target[1] - source[1],
                   distance = Math.sqrt(dx * dx + dy * dy) 
@@ -30,7 +29,23 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
             return `M${source[0]},${source[1]}A${dr},${dr} 0 0,${sweep} ${target[0]},${target[1]}`;
         }
 
-        
+        // arc hightlighting
+        const setHighlightArc = (selector) => {
+            selector.attr('stroke-opacity', 1).style("filter", "url(#glow)");
+        }
+        const setNormalArc = (selector) => {
+            selector.attr('stroke-opacity', 0.6).style("filter", "none");
+        }
+
+        const paintSavedArcSelection = () => {
+            if (selectedRoute !== "") {
+                setHighlightArc(d3.selectAll('path.route').filter(d => d.route === selectedRoute));
+                setNormalArc(d3.selectAll('path.route').filter(d => d.route !== selectedRoute));
+            } else {
+                setNormalArc(d3.selectAll('path.route'));
+            }
+        }
+ 
         const path = d3.geoPath()
     
         const width =975
@@ -49,18 +64,32 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
                 .range([2, 10]) // Adjust the range to get the desired visual effect
                 .clamp(true); 
 
-            console.log('uniqueAirportsData', uniqueAirportsData)
+            // console.log('uniqueAirportsData', uniqueAirportsData)
             svg = d3.select(svgMapRef.current)
-                
             svg.selectAll("*").remove();
+
+            const defs = svg.append("defs");
+
+            // Create the filter with feGaussianBlur and feMerge
+            const filter = defs.append("filter")
+            .attr("id", "glow");
+
+            filter.append("feGaussianBlur")
+            .attr("stdDeviation", 5)
+            .attr("result", "coloredBlur");
+
+            const feMerge = filter.append("feMerge");
+            feMerge.append("feMergeNode").attr("in", "coloredBlur");
+            feMerge.append("feMergeNode").attr("in", "SourceGraphic");
 
             svg.attr('width', width ).attr('height', height)
 
-            console.log('svg', svg)
-            console.log('usMapData', usMapData)
-            console.log('topRoutesData', topRoutesData)
+            // console.log('svg', svg)
+            // console.log('usMapData', usMapData)
+            // console.log('topRoutesData', topRoutesData)
             const stateBackground = svg.append('path')
                 .attr('fill', '#ddd')
+                .attr('class', 'backgroundmap')
                 .attr('d', path(topojson.feature(usMapData, usMapData.objects.nation)))
         
             const stateBorders = svg.append('path')
@@ -73,6 +102,20 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
             
             // Draw the routes as arcs
             const routesGroup = svg.append('g').attr('class', 'routes');
+
+            const mouseover = (e, d, i) => {
+                setNormalArc(d3.selectAll('path.route'));
+                setHighlightArc(d3.select(e.target)); 
+            }
+
+            const mouseleave = (e, d, i) => {
+                paintSavedArcSelection();
+            }
+
+            const mouseclick = (e, d, i) => { 
+                changeSelectedRoute(d.route);
+            }
+
             routesGroup.selectAll('path.route')
                 .data(topRoutesData)
                 .enter().append('path')
@@ -87,7 +130,9 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
                 .attr('stroke', (d) =>(d.sourceCode < d.destCode) ? 'orange' : 'red') // Alternate colors for the paths
                 .attr('stroke-width', d => trafficScale(d.traffic))
                 .attr('stroke-opacity', 0.6)
-
+                .on('mouseover', mouseover)
+                .on('mouseleave', mouseleave)
+                .on('click', mouseclick); 
 
             const airportsGroup = svg.selectAll('g.airport') // Ensure you select the correct existing groups
                 .data(uniqueAirportsData)
@@ -105,6 +150,13 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData}) => {
                     .attr('font-family', 'sans-serif')
                     .attr('font-size', 10)
                     .text(d => d.code);
+
+            svg.selectAll('.backgroundmap')
+            .on('click', (e, d) => {
+                changeSelectedRoute("");
+            })
+            
+            paintSavedArcSelection();
  
         }
     }, [topRoutesData])
