@@ -2,8 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 
 const BarCharts = ({dataset}) => {
+    console.log('BarCharts', dataset)
     const svgBarChartRef = useRef();
-    const [selectedMetric, setSelectedMetric] = useState('traffic');
+    const [selectedMetric, setSelectedMetric] = useState('TotalTraffic');
 
     const handleMetricChange = (event) => {
         setSelectedMetric(event.target.value);
@@ -42,30 +43,29 @@ const BarCharts = ({dataset}) => {
     }, [dataset, selectedMetric])
 
     function histogram(dataset, metric, dimensions, ctr) {
-        // console.log(metric)
-        // console.log(dataset)
-        const xAccessor = d => d[metric]
-        const yAccessor = d => d.length
+        const formatNumber = d3.format(".0f");
+
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        const monthsInData = Array.from(new Set(dataset.map(d => d.Month)))
+                          .sort((a, b) => a - b) // Ensure the months are sorted
+                          .map(m => monthNames[m - 1]); // Convert month numbers to names
+
+
+        const xAccessor = d => d.Month
+        const yAccessor = d => d[metric]
     
-        // Scales
-        const xScale = d3.scaleLinear()
-          .domain(d3.extent(dataset, xAccessor))
+        const xScale = d3.scaleBand()
+          .domain(monthsInData)
           .range([0, dimensions.ctrWidth])
-          .nice()
-    
-        const bin = d3.bin()
-          .domain(xScale.domain())
-          .value(xAccessor)
-          .thresholds(10)
-    
-        const newDataset = bin(dataset)
-        const padding = 1
-    
+          .padding(0.2);
+
+
         const yScale = d3.scaleLinear()
-          .domain([0, d3.max(newDataset, yAccessor)])
+          .domain([0, d3.max(dataset, yAccessor)])
           .range([dimensions.ctrHeight, 0])
-          .nice()
-    
+          .nice();
+
         const exitTransition = d3.transition().duration(500)
         const updateTransition = exitTransition.transition().duration(500)
     
@@ -81,44 +81,51 @@ const BarCharts = ({dataset}) => {
 
         // Draw Bars
         ctr.selectAll('rect')
-          .data(newDataset)
+          .data(dataset)
           .join(
             (enter) => enter.append('rect')
-              .attr('width', d => d3.max([0, xScale(d.x1) - xScale(d.x0) - padding]))
+              .attr('width', xScale.bandwidth())
               .attr('height', 0)
-              .attr('x', d => xScale(d.x0))
+              .attr('x', d => xScale(monthNames[d.Month - 1]))
               .attr('y', dimensions.ctrHeight)
               .attr('fill', '#b8de6f'),
             (update) => update,
-            (exit) => exit.attr('fill', '#f39233')
-              .transition(exitTransition)
-              .attr('y', dimensions.ctrHeight)
-              .attr('height', 0)
-              .remove()
+            // (exit) => exit.attr('fill', '#f39233')
+            //   .transition(exitTransition)
+            //   .attr('y', dimensions.ctrHeight)
+            //   .attr('height', 0)
+            //   .remove()
           )
           .transition(updateTransition)
-          .attr('width', d => d3.max([0, xScale(d.x1) - xScale(d.x0) - padding]))
-          .attr('height', d => dimensions.ctrHeight - yScale(yAccessor(d)))
-          .attr('x', d => xScale(d.x0))
-          .attr('y', d => yScale(yAccessor(d)))
+          .attr('width', xScale.bandwidth())
+          .attr('height', d => dimensions.ctrHeight - yScale(d[metric]))
+          .attr('x', d => xScale(monthNames[d.Month - 1]))
+          .attr('y', d => yScale(d[metric]))
           .attr('fill', '#01c5c4')
     
         labelsGroup.selectAll('text')
-          .data(newDataset)
+          .data(dataset)
           .join(
             (enter) => enter.append('text')
-              .attr('x', d => xScale(d.x0) + (xScale(d.x1) - xScale(d.x0)) / 2)
+              // .attr('x', d => xScale(d.x0) + (xScale(d.x1) - xScale(d.x0)) / 2)
+              .attr("x", d => xScale(monthNames[+d.Month - 1]) + xScale.bandwidth() / 2)
               .attr('y', dimensions.ctrHeight)
-              .text(yAccessor),
-            (update) => update,
-            (exit) => exit.transition(exitTransition)
-              .attr('y', dimensions.ctrHeight)
-              .remove()
+              // .attr("y", d => yScale(d[metric]) - 5)
+              .attr("text-anchor", "middle") 
+              .text(d => formatNumber(d[metric])),
+            // (update) => update,
+            // (exit) => exit.transition(exitTransition)
+            //   .attr('y', dimensions.ctrHeight)
+            //   .remove()
           )
           .transition(updateTransition)
-          .attr('x', d => xScale(d.x0) + (xScale(d.x1) - xScale(d.x0)) / 2)
-          .attr('y', d => yScale(yAccessor(d)) - 10)
-          .text(yAccessor)
+          .attr("x", d => xScale(monthNames[+d.Month - 1]) + xScale.bandwidth() / 2)
+          .attr("y", d => yScale(d[metric]) - 5)
+          .attr("text-anchor", "middle") 
+          .text(d => formatNumber(d[metric]))
+          // .attr('x', d => xScale(d.x0) + (xScale(d.x1) - xScale(d.x0)) / 2)
+          // .attr('y', d => yScale(yAccessor(d)) - 10)
+          // .text(yAccessor)
     
         const mean = d3.mean(dataset, xAccessor)
     
@@ -139,9 +146,14 @@ const BarCharts = ({dataset}) => {
     return (
         <div>
         <select id="metric" onChange={handleMetricChange} value={selectedMetric}>
-            <option value="traffic">Traffic</option>
-            <option value="delay">Delay</option>
-            {/* Add other options here */}
+            <option value="TotalTraffic">Total Traffic</option>
+            <option value='TotalCancel'>Total Cancel</option>
+            <option value='TotalDiverted'>Total Diverted</option>
+            <option value='AvgActualElapsedTime'>Avg Elapsed Time</option>
+            <option value='AvgAirTime'>Avg Air Time</option>
+            <option value='AvgCRSElapsedTime'>Avg Elapsed Time</option>
+            <option value='AvgDepDelay'>Average Departure Delay</option>
+            <option value='AvgTraffic'>Avg Traffic</option>
         </select>
         <svg ref={svgBarChartRef} ></svg>
         </div>

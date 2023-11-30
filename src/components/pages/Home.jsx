@@ -21,6 +21,7 @@ export const Home = () => {
   const [airLineData, setAirLineData] = useState();
   const [uniqueAirportsData, setUniqueAirportsData] = useState();
   const [selectedRoute, setSelectedRoute] = useState('');
+  const [filteredData, setFilteredData] = useState();
 
   // const [loading, setLoading] = useState(true);
   // init date range
@@ -44,6 +45,8 @@ export const Home = () => {
     if(routeData) {
       if(selectedRoute){
         const filteredData = filterSelectedRoutesByMonthRange(routeData, startMonth+1, endMonth+1, selectedRoute)
+        console.log('filteredData', filteredData)
+        setFilteredData(filteredData)
       }
 
       const topKRoutes = chartDataAggregator.getRouteData(routeData,  startMonth+1, endMonth+1, topK)
@@ -122,7 +125,10 @@ export const Home = () => {
 
       <UsMap topRoutesData={topRoutesData} usMapData={usMapData} uniqueAirportsData={uniqueAirportsData}
       selectedRoute={selectedRoute} changeSelectedRoute={changeSelectedRoute}/>
-      <BarCharts dataset={topRoutesData}/>
+
+      {
+        filteredData ? <BarCharts dataset={filteredData} /> : <div></div>
+      }
     </div>
   );
   
