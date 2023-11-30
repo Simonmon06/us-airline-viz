@@ -43,23 +43,29 @@ export const Home = () => {
   useEffect(() => {
 
     if(routeData) {
-      if(selectedRoute){
-        const filteredData = filterSelectedRoutesByMonthRange(routeData, startMonth+1, endMonth+1, selectedRoute)
-        console.log('filteredData', filteredData)
-        setFilteredData(filteredData)
-      }
 
       const topKRoutes = chartDataAggregator.getRouteData(routeData,  startMonth+1, endMonth+1, topK)
 
+      if(selectedRoute){
+
+        if (topRoutesData.map(x=>x.route).includes(selectedRoute)) {
+          const filteredData = filterSelectedRoutesByMonthRange(routeData, startMonth+1, endMonth+1, selectedRoute)
+          // console.log('filteredData', filteredData)
+          setFilteredData(filteredData);
+        } else {
+          setSelectedRoute('');
+        }
+      }
+
       const routesWithCoords = topKRoutes.map(route => {
-      const [sourceCode, destCode] = route.route.split('-');
-      return {
-          ...route,
-          source: metadata.airport_coords[sourceCode],
-          destination: metadata.airport_coords[destCode],
-          sourceCode: sourceCode,
-          destCode: destCode
-        };
+        const [sourceCode, destCode] = route.route.split('-');
+        return {
+            ...route,
+            source: metadata.airport_coords[sourceCode],
+            destination: metadata.airport_coords[destCode],
+            sourceCode: sourceCode,
+            destCode: destCode
+          };
       });
       
       const uniqueAirports = getUniqueAirportsData(routesWithCoords, metadata)
@@ -72,17 +78,10 @@ export const Home = () => {
 
 
   // The handler to update the selected route
-  const handleRouteChange = (e) => {
-    setSelectedRoute(e.target.value);
-  };
+  const handleRouteChange = (e) => { setSelectedRoute(e.target.value); }
 
-  const changeSelectedRoute = (newValue) => {
-    if (topRoutesData.map(x=>x.route).includes(newValue) || newValue === '') {
-      setSelectedRoute(newValue);
-    } else {
-      alert('invalid click route selection.');
-    }
-  }
+  // handler for click on route inside map
+  const changeSelectedRoute = (newValue) => { setSelectedRoute(newValue); }
   
   const handleMonthChange = (values) => {
     setStartMonth(values[0]);
@@ -91,7 +90,6 @@ export const Home = () => {
 
   const handleTopKChange = (e) => {
     setTopK(Number(e.target.value)); // Update topK state when a new option is selected
-    setSelectedRoute("");
   };
 
   

@@ -9,7 +9,6 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
         function linkArc(d) {
             const source = projection(d.source);
             const target = projection(d.destination);
-            
             if (!source || !target) return ''; // Check if the projection is valid for both points
             
             const dx = target[0] - source[0],
@@ -38,7 +37,14 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
 
         const paintSavedArcSelection = () => {
             const tooltipdiv = d3.select("#mapTip");
-            if (selectedRoute !== "") {
+            if (!topRoutesData.map(x=>x.route).includes(selectedRoute)) {
+                changeSelectedRoute('');
+                setNormalArc(d3.selectAll('path.route'));
+                tooltipdiv
+                    .style('opacity', 1.0)
+                    .style("display", 'none')
+                    .html("");
+            } else {
                 const foundRoutes = d3.selectAll('path.route').filter(d => d.route === selectedRoute);
                 setHighlightArc(foundRoutes);
                 setNormalArc(d3.selectAll('path.route').filter(d => d.route !== selectedRoute));
@@ -48,13 +54,6 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
                     .style('opacity', 1.0)
                     .style("display", 'block')
                     .html(`Route: ${data.route}<br/><br/>Traffic: ${data.traffic}<br/><br/>Delay: ${data.delay.toFixed(2)} Minutes`);
-
-            } else {
-                setNormalArc(d3.selectAll('path.route'));
-                tooltipdiv
-                    .style('opacity', 1.0)
-                    .style("display", 'none')
-                    .html("");
             }
         }
  
