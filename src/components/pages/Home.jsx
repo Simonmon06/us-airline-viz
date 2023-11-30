@@ -47,14 +47,10 @@ export const Home = () => {
       const topKRoutes = chartDataAggregator.getRouteData(routeData,  startMonth+1, endMonth+1, topK)
 
       if(selectedRoute){
-
-        if (topRoutesData.map(x=>x.route).includes(selectedRoute)) {
           const filteredData = filterSelectedRoutesByMonthRange(routeData, startMonth+1, endMonth+1, selectedRoute)
-          // console.log('filteredData', filteredData)
           setFilteredData(filteredData);
-        } else {
-          setSelectedRoute('');
-        }
+      } else {
+        setFilteredData();
       }
 
       const routesWithCoords = topKRoutes.map(route => {

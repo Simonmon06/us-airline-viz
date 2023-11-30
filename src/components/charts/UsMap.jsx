@@ -38,12 +38,12 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
         const paintSavedArcSelection = () => {
             const tooltipdiv = d3.select("#mapTip");
             if (!topRoutesData.map(x=>x.route).includes(selectedRoute)) {
-                changeSelectedRoute('');
                 setNormalArc(d3.selectAll('path.route'));
                 tooltipdiv
                     .style('opacity', 1.0)
                     .style("display", 'none')
                     .html("");
+                changeSelectedRoute('');
             } else {
                 const foundRoutes = d3.selectAll('path.route').filter(d => d.route === selectedRoute);
                 setHighlightArc(foundRoutes);
