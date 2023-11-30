@@ -88,11 +88,12 @@ export const Home = () => {
 
   const handleTopKChange = (e) => {
     setTopK(Number(e.target.value)); // Update topK state when a new option is selected
+    setSelectedRoute("");
   };
 
   
   return (
-    <Container>
+    <div className="my-container">
       <div>
         <DateRangePicker initStart={startMonth} initEnd={endMonth} handleChange={handleMonthChange}/>
       </div>
@@ -121,7 +122,7 @@ export const Home = () => {
       <UsMap topRoutesData={topRoutesData} usMapData={usMapData} uniqueAirportsData={uniqueAirportsData}
       selectedRoute={selectedRoute} changeSelectedRoute={changeSelectedRoute}/>
       <BarCharts dataset={topRoutesData}/>
-    </Container>
+    </div>
   );
   
 

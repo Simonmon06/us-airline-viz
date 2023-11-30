@@ -23,7 +23,6 @@ const UsMap = ({topRoutesData, usMapData, uniqueAirportsData, selectedRoute, cha
             const sweep = (d.sourceCode < d.destCode) ? 0 : 1;
             
             // Calculate the arc's radius adjusted by the curvature
-            
             const dr = Math.max(distance, distance * curvature);
 
             return `M${source[0]},${source[1]}A${dr},${dr} 0 0,${sweep} ${target[0]},${target[1]}`;

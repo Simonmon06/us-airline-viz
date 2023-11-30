@@ -10,6 +10,9 @@ export const Navbar = () => {
       <Link to="/" className="title">
        FlightAnalysis 
       </Link>
+      <div>
+        <iframe style={{pointerEvents: "none"}} src="https://giphy.com/embed/BSx6mzbW1ew7K" width="80" height="50" frameBorder="0" class="giphy-embed"></iframe>
+      </div>
       <div className="menu" onClick={() => setMenuOpen(!menuOpen)}>
         <span></span>
         <span></span>

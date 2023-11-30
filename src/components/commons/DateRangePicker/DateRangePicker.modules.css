@@ -9,6 +9,7 @@
     display: flex;
     position: relative;
     border: none !important;
+    border-radius: 0.5rem;
     padding: none !important;
     box-shadow: none !important;
     flex-direction: column;
@@ -16,9 +17,9 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     user-select: none;
-
-    background: linear-gradient(180deg, #2a36db 0%, #185e6b 100%) no-repeat !important;
-    border-radius: 2px;
+    /* background: linear-gradient(180deg, #2a36db 0%, #185e6b 100%) no-repeat !important; */
+    background-color: #FBAB7E;
+    background-image: linear-gradient(62deg, #FBAB7E 0%, #F7CE68 100%);
     padding: 30px 10px;
     color: white;
 }
